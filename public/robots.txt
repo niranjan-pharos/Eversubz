@@ -1,0 +1,67 @@
+# Notice: Do not change until asked to CTRLTAB
+
+User-agent:*
+Allow: /
+
+User-agent: Twitterbot
+Allow:/
+
+User-agent: Yandex
+Allow:/
+
+User-agent: TelegramBot
+Allow:/
+
+User-agent: Pinterestbot
+Allow:/
+
+User-agent: msnbot
+Allow:/
+
+User-agent: LinkedInBot
+Allow:/
+
+User-agent: Googlebot-Image
+Allow:/
+
+User-agent: Googlebot-Mobile
+Allow:/
+
+User-agent: Googlebot-News
+Allow:/
+
+User-agent: Googlebot-Video
+Allow:/
+
+User-agent: Mediapartners-Google
+Allow:/
+
+User-agent: Adsbot-News
+Allow:/
+
+User-agent: Googlebot
+Allow:/
+
+User-agent: Discordbot
+Allow:/
+
+User-agent: facebookexternalhit
+Allow:/
+
+User-agent: Bingbot
+Allow:/
+
+User-agent: baiduspider
+Allow:/
+
+User-agent: Applebot
+Allow:/
+
+User-agent: teoma
+Allow:/
+
+User-agent: Yeti
+Allow:/
+
+User-agent: ia_archiver
+Disallow: /

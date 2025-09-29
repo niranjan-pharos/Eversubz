@@ -1,0 +1,11 @@
+[
+    {
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.eversabz.twa",
+        "sha256_cert_fingerprints":
+          ["B3:8F:B7:7E:CC:59:2B:50:40:84:E0:0D:B3:CA:AA:05:82:6B:CB:5C:2D:D1:C6:1E:4F:98:A1:68:85:40:72:EE"]
+      }
+    }
+  ]

@@ -1,0 +1,87 @@
+body{
+    background:linear-gradient(to right, #00c5fb 0%, #0253cc 100%);
+}
+.account-page .main-wrapper {
+    width: 100%;
+}
+
+.account-page .main-wrapper .account-content {
+    padding: 80px 0;
+}
+.account-page .main-wrapper, .file-cont-wrap, .file-wrap, .task-board-color .board-color-list {
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.account-page .main-wrapper .account-content .account-logo {
+    margin-bottom: 30px;
+    text-align: center;
+}
+.account-page .main-wrapper .account-content .account-logo img {
+    width: 100px;
+}
+.account-page .main-wrapper .account-content .account-box {
+    background-color: #ffffff;
+    border: 1px solid #ededed;
+    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 20%);
+    margin: 0 auto;
+
+    overflow: hidden;
+    width: 480px;
+    border-radius: 4px;
+}
+.account-page .main-wrapper .account-content .account-box .account-wrapper {
+    padding: 30px;
+}
+.account-page .main-wrapper .account-content .account-box .account-wrapper .account-title {
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.account-page .main-wrapper .account-content .account-box .account-wrapper .account-subtitle {
+    color: #000000c2;
+    font-size: 18px;
+    text-align: center;
+    margin: 0 0 30px;
+}
+
+.account-page .main-wrapper .account-content .account-box .form-group {
+    margin-bottom: 25px;
+}
+.account-page .main-wrapper .account-content .account-box label {
+    color: #1f1f1f;
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+/* .account-page .main-wrapper .account-content .account-box .form-control {
+    background-color: #fbfbfb;
+    border: 1px solid #e3e3e3;
+    height: 46px;
+    border-radius: 4px;
+} */
+
+.account-page .main-wrapper .account-content .account-box .form-control {
+    background-color: #fff;
+    border: 1px solid#0000008a;
+    height: 46px;
+    border-radius: 4px;
+}
+.account-page .main-wrapper .account-content .account-box .account-btn {
+    background: #00c5fb;
+    background: linear-gradient(to right, #00c5fb 0%, #c31e23 100%);
+    border: 0;
+    display: block;
+    font-size: 22px;
+    width: 100%;
+    border-radius: 4px;
+    padding: 10px 26px;
+}
+
+@media only screen and (max-width: 767px) {
+    .account-page .main-wrapper .account-content .account-box {
+        width: 100%;
+    }
+  }

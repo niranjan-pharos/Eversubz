@@ -1,0 +1,81 @@
+<table class="body-wrap"
+    style="width:97% !important;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;height:100%;background-color:#efefef;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:none;">
+    <tr>
+        <td class="container"
+            style="display:block !important;clear:both !important;margin-top:20px !important;margin-bottom:0 !important;margin-right:auto !important;margin-left:auto !important;max-width:625px !important;">
+            <!-- Message start -->
+            <table style="width:100% !important;border-collapse:collapse;">
+                <tr>
+                    <td class="masthead" style="text-align:center; padding-top: 40px; padding-bottom: 30px; padding-right: 0; padding-left: 0;
+                        background-color: #0071c1; background-image: url('{{ asset('uploads/common/logo.png') }}');
+                        background-repeat: no-repeat; background-position: center 15px; background-attachment: scroll;
+                        color: white; border-radius: 10px 10px 0 0;">
+                        {{-- <a href="#"> --}}
+                            <img class="email-logo" src="{{ asset('assets/images/logo.png') }}" alt="logo"
+                                style="width: 100px; background: #fff; border-radius: 10px; padding: 5px;">
+                            {{-- </a> --}}
+                        <h1 style="line-height: 1.25; font-size: 32px; margin-top: 0 !important; margin-bottom: 0 !important;
+                        margin-right: auto !important; margin-left: auto !important; max-width: 90%;">Welcome to
+                            Eversabz</h1>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="content"
+                        style="background-color:white;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;padding-top:20px;padding-bottom:0;padding-right:20px;padding-left:20px;">
+                        <h2
+                            style="margin: 0 0 0.5rem 0; line-height: 1.25;  color: #333E48; font-size: 2rem; font-weight: 500; font-style: normal;">
+                            Welcome, {{ $user->name }}!</h2>
+                        <p>You are successfully registered to Eversabz.</p>
+                        <p>Get more info <a title="about us" href="."> Eversabz.</a></p>
+
+                        <p><a title=" student login" class="trbtn" href="{{ route('user.login') }}"
+                                style="background: #0071c1; padding: 10px; color: #fff; border-radius: 5px;">Login
+                                Now</a></p>
+
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content"
+                        style="background-color:white;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;padding-top:20px;padding-bottom:0;padding-right:20px;padding-left:20px;">
+                        <p style="font-size:14px;font-weight:normal;margin-bottom:20px;">If you have any questions, you
+                            can simply reply to this email with your questions and we will get back to
+                            you shortly with an answer.</p>
+                        <p style="font-size:14px;font-weight:normal;margin-bottom:20px;">Thanks again for your choice!
+                            We appreciate that you've chosen us.</p>
+                        <!-- signature begin -->
+                        <p style="font-size:14px; font-weight:normal;  margin-bottom:20px;">Thanks, <br />Eversabz</p>
+                        <!-- <p style="font-size:14px;font-weight:normal;margin-bottom:20px;"></p> -->
+                        <p style="font-size:14px;font-weight:normal;margin-bottom:20px;">For any support: <a
+                                title="contactus" href="{{ asset ('contactus') }}"
+                                style="color:#050505;text-decoration:none;">Contact Us</a> <br />
+                            <b>Eversabz</b> is always available to assist you.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!-- body end -->
+        </td>
+    </tr>
+    <!-- footer begin -->
+    <tr>
+        <td class="container"
+            style="display:block !important;clear:both !important;margin-top:20px !important;margin-bottom:0 !important;margin-right:auto !important;margin-left:auto !important;max-width:580px !important;">
+            <table style="width:100% !important;border-collapse:collapse;">
+                <tr>
+                    <td class="content footer"
+                        style="text-align:center; background-color:#efefef;background-image:none;background-repeat:repeat;background-position:top left;background-attachment:scroll;padding-top:2px;padding-bottom:0;padding-right:20px;padding-left:20px;">
+                        <p style="font-size:14px;font-weight:normal;margin-bottom:20px;">You were sent this email
+                            because you are registered with <a title="home" href="/">Eversabz</a>.<br>
+                            Email: <a title="mail" href="mailto:info.eversabz@gmail.com"
+                                style="color:#050505;text-decoration:none;">
+                                <span class="__cf_email__">info.eversabz@gmail.com</span></a>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <!-- footer end -->
+</table>

@@ -7,9 +7,14 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class VerifyEmail extends Notification
+class VerifyEmail extends Notification implements ShouldQueue
 {
+    use Queueable;
+    
     public function via($notifiable)
     {
         return ['mail'];

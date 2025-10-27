@@ -551,10 +551,7 @@
                         </div>
 
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1 ">
-
-
-
+                    <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1" style="--tw-space-y-reverse: 1;">
                         <div class="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative">
                             <h4 class="font-bold text-base">About {{ $ngo->ngo_name ?? 'N/A' }} :</h4>
 
@@ -613,24 +610,27 @@
                         </h4>
                         <br>
                         <br>
-                        @if($ngo->members->isEmpty())
+                        @if($ngo->user->isEmpty())
                         <div class="p-4 rounded-md">
                             <p>No members have joined this NGO yet.</p>
                         </div>
                         @else
-                        @foreach($ngo->members as $users)
+                        @foreach($ngo->user as $users)
                         <div class="grid md:grid-cols-2 md:gap-2 gap-3">
 
 
                             <div class="flex md:items-center space-x-4 p-4 rounded-md ">
                                 <div class="side-list-item">
-                                    @if($users->image)
-                                    <img src="{{ asset('storage/' . $users->image) }}" alt="{{ $users->name }}"
-                                        class="side-list-image rounded-md">
+                                    @php
+                                        $imagePath = 'storage/' . $users->image;
+                                    @endphp
+
+                                    @if($users->image && file_exists(public_path($imagePath)))
+                                        <img src="{{ asset($imagePath) }}" alt="{{ $users->name }}" class="side-list-image rounded-md">
                                     @else
-                                    <img loading="eager" src="{{ asset('assets/images/user-image1.png') }}"
-                                        alt="{{ $users->name }}" class="side-list-image rounded-md">
+                                        <img loading="eager" src="{{ asset('public/assets/images/user-image1.png') }}" alt="{{ $users->name }}" class="side-list-image rounded-md">
                                     @endif
+
                                     <div class="flex-1">
                                         <h4 class="side-list-title">{{ $users->name ?? 'N/A' }} </h4>
                                         <div class="side-list-info">Joined -
@@ -969,11 +969,11 @@
                                     fill="currentColor" />
                             </svg>
                             <div class="flex gap-4">
-                                <span class="font-semibold text-black ">Establiished - </span>
+                                <span class="font-semibold text-black ">Established - </span>
                                 <p class="text-left">@if ($ngo->establishment)
                                     {{ $ngo->establishment }}
                                     @else
-                                    No Establiished year available.
+                                    No Established year available.
                                     @endif</p>
                             </div>
                         </li>
@@ -983,9 +983,21 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                             </svg>
-                            <div><span class="font-semibold text-black "> Members </span>{{ $memberCount }}
+                            <div><span class="font-semibold text-black "> Members - </span>{{ $memberCount }}
                                 People </div>
                         </li>
+                        <li class="flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6 text-gray-700">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.25 5.25a2.25 2.25 0 012.25-2.25h15a2.25 2.25 0 012.25 2.25v13.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V5.25zM6 8.25h12M6 12h6m-6 3.75h4.5" />
+                            </svg>
+                            
+                            <div>
+                                <span class="font-semibold text-black">ID -</span> {{ $uid }}
+                            </div>
+                        </li>
+                        
 
                     </ul>
 
@@ -1019,7 +1031,12 @@
                     <div class="side-list">
                         @foreach($ngo->members->slice(0, 5) as $member)
                         <div class="side-list-item">
-                            <img src="{{ asset('storage/' . $member->image) }}" alt="" class="side-list-image rounded-md">
+                            @if($member->image)
+                                <img src="{{ asset('storage/' . $member->image) }}" alt="" class="side-list-image rounded-md">
+                            @else
+                                <img loading="eager" src="{{ asset('public/assets/images/user-image1.png') }}"
+                                    alt="{{ $member->name }}" class="side-list-image rounded-md">
+                            @endif
                             <div class="flex-1">
                                 <h4 class="side-list-title"> {{ $member->name}} </h4>
                                 <div class="side-list-info"> {{ $member->designation}} </div>

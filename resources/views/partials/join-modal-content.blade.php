@@ -6,7 +6,7 @@
 
 <form id="joinForm" action="{{ route('user.join') }}" method="POST">
     @csrf
-    <input type="hidden" name="ngo_id" value="{{ $ngo->id }}">
+    <input type="hidden" name="ngo_id" value="{{ urlencode(Crypt::encryptString($ngo->id)) }}">
     
     <div class="flex justify-center">
         @if($joinedNgo)

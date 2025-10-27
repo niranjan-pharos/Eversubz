@@ -586,7 +586,7 @@
                 @endif
             @else
                 {{-- Registration form for non-authenticated users - keep existing code --}}
-                <div class="row justify-content-center">
+                <!-- <div class="row justify-content-center">
                 <div class="mob-pad-0">
                     <form action="{{ route('register') }}" method="POST" id="signup-form">
                         <h5 class="mb-4 mob-center text-center">Please log in to view Jobs listings and details.</h5>
@@ -599,7 +599,7 @@
                             <input type="text" class="form-control custom-input1" placeholder="Username" name="username"
                                     required>
                         </div>
-                        <!-- <div class="row mb-3">
+                        <div class="row mb-3">
                             <div class="col-12 col-md-6 mb-3 mb-md-0">
                                 <input type="text" class="form-control custom-input1" placeholder="Name" name="name"
                                     required>
@@ -608,7 +608,7 @@
                                 <input type="text" class="form-control custom-input1" placeholder="Username" name="username"
                                     required>
                             </div>
-                        </div> -->
+                        </div>
                         <div class="mb-3">
                             <input type="email" class="form-control custom-input1" placeholder="Business email" name="email"
                                 required>
@@ -644,13 +644,15 @@
                         </div>
                         <button type="submit" class="btn btn-primary w-100 py-2 register-btn">
                             Register Now
-                            <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                            <span class="spinner-border spinner-border-sm" style="display: none;"  role="status" aria-hidden="true"></span>
                         </button>
                         <p class="text-center mt-3 small">Already have a Account? <a href="{{ route('user.login') }}">Log in</a>
                         </p>
                     </form>
                 </div>
-            </div>
+            </div> -->
+
+            <x-register-form title-text="Please log in to view Jobs listings and details." />
             @endif
         </div>
         
@@ -669,12 +671,14 @@
             $('#signup-form').on('submit', function(e) {
                 e.preventDefault();
 
-                const $button = $('#signup-btn');
-                const $loader = $button.find('.spinner-border');
+                const $button = $('.register-btn');
+                const $spinner = $button.find('.spinner-border');
+                const $btnText = $button.find('.btn-text');
                 const $errorDiv = $('#signup-error');
 
                 $button.prop('disabled', true);
-                $loader.show();
+                $spinner.show();
+                $btnText.hide();
                 $errorDiv.hide();
 
                 const formData = $(this).serialize();
@@ -685,15 +689,15 @@
                     data: formData,
                     success: function(response) {
                         if (response.success) {
-                            $errorDiv.removeClass('text-danger').addClass('text-success').text(
-                                response.message).show();
+                            $errorDiv.removeClass('text-danger').addClass('text-success').text(response.message).show();
                             setTimeout(() => {
                                 window.location.href = response.redirect;
                             }, 1000);
                         } else {
-                            $errorDiv.text(response.message).show();
+                            $errorDiv.removeClass('text-success').addClass('text-danger').text(response.message).show();
                             $button.prop('disabled', false);
-                            $loader.hide();
+                            $spinner.hide();
+                            $btnText.show();
                         }
                     },
                     error: function(xhr) {
@@ -704,14 +708,15 @@
                         } else if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
                         }
-                        $errorDiv.text(errorMessage).show();
+                        $errorDiv.removeClass('text-success').addClass('text-danger').text(errorMessage).show();
                         $button.prop('disabled', false);
-                        $loader.hide();
+                        $spinner.hide();
+                        $btnText.show();
                     }
                 });
             });
 
-            function togglePassword(fieldId) {
+            window.togglePassword = function(fieldId) {
                 const passwordField = $('#' + fieldId);
                 const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
                 passwordField.attr('type', type);
@@ -719,6 +724,7 @@
                 icon.toggleClass('fa-eye fa-eye-slash');
             }
         });
+
     </script>
 
     <script>

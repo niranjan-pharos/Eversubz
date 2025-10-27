@@ -1,4 +1,5 @@
 <x-guest-layout>
+    <a href="/" class="header-logo"><img src="https://eversabz.com/assets/images/logo.png" alt="logo"></a>
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
@@ -36,4 +37,17 @@
             </x-primary-button>
         </div>
     </form>
+<style>
+    svg{
+        display: none;
+}
+
+img, video {
+    max-width: 50%;
+    height: auto;
+    margin-top: 20px;
+    margin-bottom: 23px;
+    place-self: center;
+}
+</style>
 </x-guest-layout>

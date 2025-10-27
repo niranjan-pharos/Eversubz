@@ -336,6 +336,20 @@
     .abouteversbuz div.overflow-hidden{
         overflow: visible !important;
     }
+
+    .space-y-4::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .space-y-4::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 3px;
+    }
+
+    .space-y-4::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
 </style>
 <main id="site__main" class="2xl:ml-0 xl:ml-0 p-2.5 my-3">
 
@@ -345,11 +359,11 @@
 
             <div class="relative overflow-hidden lg:h-80 h-44 w-full">
                 <img loading="eager" src="{{ asset('storage/' . $fundraiser->main_image) }}" alt="main image"
-                    class="h-full w-full object-contain inset-0">
+                    class="w-full h-full object-cover" style="object-fit: contain"> <!-- use object-cover instead of object-contain -->
 
-                <div class="w-full bottom-0 absolute left-0 bg-gradient-to-t from -black/60 pt-10 z-10"></div>
-
+                <div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
             </div>
+
 
             <div class="lg:p-5 p-3 lg:px-10 pb-8">
 
@@ -417,14 +431,13 @@
                 </div>
 
                 <div class="box p-5 px-6 relative abouteversbuz">
-
-                    <h3 class="font-semibold text-lg text-black "> About </h3>
-
-                    <div class="space-y-4 leading-7 tracking-wide mt-4 text-black text-sm" style="overflow: visible !important;">
-                        <p style="overflow: visible !important;">{!! $fundraiser->fundraising_description !!} </p>
+                    <h3 class="font-semibold text-lg text-black">About</h3>
+                    <div class="space-y-4 leading-7 tracking-wide mt-4 text-black text-sm" 
+                         style="max-height: 200px; overflow-y: auto;">
+                        <p>{!! $fundraiser->fundraising_description !!}</p>
                     </div>
-
                 </div>
+
 
                 <div class="box p-5 px-6">
                         <div class="flex items-baseline justify-between text-black">

@@ -44,11 +44,17 @@ class NgoCategoryController extends Controller
 
             $imagePath = $category->image ? asset('storage/' . $category->image) : asset('storage/no-image.jpg');
 
+            $categorySlugHtml = '<span class="business-badge business-everstore">
+                                    <span class="business-dot"></span>' . htmlspecialchars($category->slug ?? '-') . '
+                                 </span>';
+
             $result['data'][$key] = [
-                '<img src="' . $imagePath . '" alt="Category Image" class="img-thumbnail" style="width: 100px; height: 100px;">',
+                '<img src="' . $imagePath . '" alt="Category Image" class="img-thumbnail" style="width: 50px; height: 50px;">',
                 $category->name,
-                $category->slug,
+                $categorySlugHtml,
                 $status,
+                optional($category->created_at)->format('d-m-Y'),
+                optional($category->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

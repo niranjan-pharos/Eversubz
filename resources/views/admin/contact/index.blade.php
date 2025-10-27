@@ -21,6 +21,8 @@
                       <th>Address</th>
                       <th>Subject</th>
                       <th>message</th>
+                      <th>Created Date</th>
+                      <th>Updated Date</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -32,7 +34,9 @@
                     <td>{{ $contact->phone }}</td>
                     <td>{{ $contact->address }}</td>
                     <td>{{ $contact->subject }}</td>
-                    <td>{{ $contact->message }}</td>
+                    <td style="word-break: break-word; white-space: normal;">{{ $contact->message }}</td>
+                    <td>{{ $contact->created_at->format('d-m-Y') }}</td>
+                    <td>{{ $contact->updated_at->format('d-m-Y') }}</td>
                 </tr>
             @endforeach
         </tbody>

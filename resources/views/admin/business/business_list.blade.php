@@ -53,6 +53,8 @@
                                                     <th>Address</th>
                                                     <th>Status</th>
                                                     <th>Feature</th>
+                                                    <th>Created Date</th>
+                                                    <th>Updated Date</th>
                                                     {{-- <th class="text-right">Action</th> --}}
                                                 </tr>
                                             </thead>

@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::table('category_candidates', function (Blueprint $table) {
             // Add fundraising_id column after 'id'
-            $table->unsignedBigInteger('fundraising_id')->nullable()->after('id');
-            $table->foreign('fundraising_id')->references('id')->on('fundraisings')->onDelete('set null');
+            if (!Schema::hasColumn('category_candidates', 'fundraising_id')) {
+                $table->unsignedBigInteger('fundraising_id')->nullable()->after('id');
+                $table->foreign('fundraising_id')->references('id')->on('fundraisings')->onDelete('set null');
+            }
 
         });
     }

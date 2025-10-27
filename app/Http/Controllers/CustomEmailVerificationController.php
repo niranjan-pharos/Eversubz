@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Log;
 
 class CustomEmailVerificationController extends Controller
 {

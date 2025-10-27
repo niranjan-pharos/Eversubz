@@ -19,7 +19,7 @@
                             </ul>
 
                             <div class="tab-content tab-content1">
-                                <div class="tab-pane show active" id="jobListing">
+                                <div class="tab-pane show active" id="jobListing" style="padding: 0px 8px;">
                                     <div class="table table-responsive">
                                         <table class="table custom-table mb-0" id="jobTable">
                                             <thead>
@@ -29,6 +29,8 @@
                                                     <th>Location</th>
                                                     <th> Category</th>
                                                     <th> Status</th>
+                                                    <th>Created Date</th>
+                                                    <th>Updated Date</th>
                                                     <th class="text-right">Action</th>
                                                 </tr>
                                             </thead>
@@ -569,12 +571,12 @@
 
     </script>
     <style>
-        .custom-table td:nth-child(6),
-        .custom-table th:nth-child(6) {
+        .custom-table td:nth-child(8),
+        .custom-table th:nth-child(8) {
           text-align: center;
         }
 
-        .custom-table td:nth-child(6) {
+        .custom-table td:nth-child(8) {
           display: flex;
           justify-content: center;
           align-items: center;

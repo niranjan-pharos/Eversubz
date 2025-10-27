@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\CheckAuthController;
 use App\Http\Controllers\Frontend\AdPostController;
 use App\Http\Controllers\Frontend\SettingsController;
 use App\Http\Controllers\Frontend\ProfilesController;
+use App\Http\Controllers\Frontend\ProfilesController1;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\CityController;
 use App\Http\Controllers\Frontend\BusinessProductsController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Frontend\FundraisingCategoryController;
 use App\Http\Controllers\Frontend\EventController;
 use App\Http\Controllers\Frontend\FundraisingController;
 use App\Http\Controllers\Frontend\DashboardController;
+use App\Http\Controllers\Frontend\DashboardController1;
 use App\Http\Controllers\Frontend\DonationController;
 use App\Http\Controllers\Frontend\NgoUserController;
 use App\Http\Controllers\Frontend\UserOrdersController;
@@ -61,6 +63,7 @@ use App\Models\OrderEvent;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Website\AdsCardsListController;
 
 
 Route::get('/gd-check', function() {
@@ -247,6 +250,14 @@ Route::get('author/{slug}', [HomeController::class, 'userProfile'])->name('selle
     Route::get('/payment-redirect', [cartController::class, 'redirectToPayment'])->name('redirect.to.payment');
     // Route::post('/orders/complete', [OrderController::class, 'complete'])->name('orders.complete');
 
+    // This is for ads cards new design.
+    Route::get('/ads-cards', [AdsCardsListController::class, 'index'])->name('ads.cards.list');
+    Route::get('/package/{id}', [AdsCardsListController::class, 'show'])->name('package.show');
+    Route::get('/search-userid', [AdsCardsListController::class, 'search'])->name('searchuserid');
+
+
+    
+
 
 
 
@@ -270,8 +281,16 @@ Route::get('author/{slug}', [HomeController::class, 'userProfile'])->name('selle
     // NGO's Routes  
     Route::get('sabz-future', [NgoController::class, 'index'])->name('ngo.list');
     Route::get('sabz-future/{id}', [NgoController::class, 'show'])->name('ngo.show');
+    Route::get('sabz-future-donation/{id}', [NgoController::class, 'donationpkg'])->name('ngo.donationpackege');
     Route::post('user/join', [NgoController::class, 'join'])->name('user.join');
     Route::post('leave-ngo', [NgoController::class, 'leave'])->name('user.leave');
+    Route::get('create-ngo', [NgoController::class, 'register'])->name('ngo.create');
+    Route::post('/process-ngo-register', [NgoController::class, 'storeNgo'])->name('ngo.stores');
+    Route::get('donation-support/{id}/{price}', [NgoController::class, 'support'])->name('donation.support');
+    Route::post('donation/donations', [NgoController::class, 'saveDonation'])->name('donations.save');
+    Route::post('donation/test', [NgoController::class, 'testDonation'])->name('donation.test');
+
+    Route::post('/search-ngo-categories', [NgoController::class,'searchCategories'])->name('ajaxSearchNgoCategorys');
 
 
     // cart  and checkoutroutes  
@@ -397,6 +416,7 @@ Route::get('author/{slug}', [HomeController::class, 'userProfile'])->name('selle
     // Routes for authenticated but potentially unverified users
     Route::middleware(['auth', 'no.cache'])->group(function () {
         Route::get('profile', [ProfilesController::class, 'index'])->name('profile');
+        Route::get('profile1', [ProfilesController1::class, 'index'])->name('profile1');
         Route::get('profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('profile-edit', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('profile-edit', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -405,6 +425,7 @@ Route::get('author/{slug}', [HomeController::class, 'userProfile'])->name('selle
     // Routes for verified users
     Route::middleware(['auth', 'verified', 'no.cache'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard1', [DashboardController1::class, 'index'])->name('dashboard1');
         Route::post('/api/event-categories', [EventCategoryController::class, 'searchCategories'])->name('api.event-categories');
         
         Route::get('basic-info', [SettingsController::class, 'index'])->name('basicInfo');

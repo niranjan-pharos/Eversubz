@@ -20,6 +20,8 @@
                                             <th>Duration</th>
                                             <th>Feature</th>
                                             <th>Status</th>
+                                            <th>Created Date</th>
+                                            <th>Updated Date</th>
                                             <th class="text-right">Action</th>
                                         </tr>
                                     </thead>
@@ -80,35 +82,78 @@
         </div>
         <!-- End Response Modal -->
         <script type="text/javascript">
-    var base_url = "{{ url('/admin/') }}";
-    var fundraisingTable;
+            var base_url = "{{ url('/admin/') }}";
+            var fundraisingTable;
 
-    $(document).ready(function () {
-        fundraisingTable = $('#fundraisingTable').DataTable({
-            'ajax': "{{ route('adminFundraisingsList') }}",
-            'order': [],
+            $(document).ready(function () {
+                fundraisingTable = $('#fundraisingTable').DataTable({
+                    'ajax': "{{ route('adminFundraisingsList') }}",
+                    'order': [],
+                    dom: '<"row mb-3" <"col-md-4"l> <"col-md-4 text-center"B> <"col-md-4 d-flex justify-content-end"f> >rtip',
+                    buttons: [
+                      {
+                        extend: 'collection',
+                        text: '<i class="fa fa-print"></i> Export',
+                        className: 'btn btn-outline-dark',
+                        buttons: [
+                          { extend: 'print', text: 'Print' },
+                          { extend: 'excelHtml5', text: 'Excel' },
+                          { extend: 'csvHtml5', text: 'CSV' },
+                          { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4' },
+                          {
+                            text: 'Word',
+                            action: function ( e, dt, node, config ) {
+                              var data = dt.buttons.exportData({decodeEntities: true});
+
+                              var html = '<table border="1">';
+                              html += '<tr>' + data.header.map(h => '<th>' + h + '</th>').join('') + '</tr>';
+                              data.body.forEach(row => {
+                                html += '<tr>' + row.map(cell => {
+                                    var div = document.createElement('div');
+                                    div.innerHTML = cell;
+                                    var img = div.querySelector('img');
+                                    if(img) return '<td>' + img.src + '</td>';
+                                    return '<td>' + div.textContent + '</td>';
+                                }).join('') + '</tr>';
+                              });
+                              html += '</table>';
+
+                              var blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                              var url = URL.createObjectURL(blob);
+                              var a = document.createElement('a');
+                              a.href = url;
+                              a.download = 'Orders.doc';
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                });
+
+
+                $('body').on('click', '.change-status', function () {
+            let isChecked = $(this).is(':checked');
+            let id = $(this).data('id');
+            $.ajax({
+                url: '{{ route('fundraisingChangeStatus') }}',
+                method: 'PUT',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    status: isChecked ? 'active' : 'inactive',
+                    id: id
+                },
+                success: function (response) {
+                    toastr.success(response.message);
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    toastr.error('Failed to change status');
+                }
+            });
         });
-
-        $('body').on('click', '.change-status', function () {
-    let isChecked = $(this).is(':checked');
-    let id = $(this).data('id');
-    $.ajax({
-        url: '{{ route('fundraisingChangeStatus') }}',
-        method: 'PUT',
-        data: {
-            "_token": "{{ csrf_token() }}",
-            status: isChecked ? 'active' : 'inactive',
-            id: id
-        },
-        success: function (response) {
-            toastr.success(response.message);
-        },
-        error: function (xhr) {
-            console.error(xhr.responseText);
-            toastr.error('Failed to change status');
-        }
-    });
-});
 
         $('body').on('click', '.featured-status', function () {
             let isChecked = $(this).is(':checked');

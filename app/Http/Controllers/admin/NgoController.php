@@ -95,7 +95,9 @@ class NgoController extends Controller
                 $post->contact_phone,      // Contact
                 $address,                  // Address
                 $status,                   // Status
-                $feature                   // Feature
+                $feature,                   // Feature
+                optional($post->created_at)->format('d-m-Y'),
+                optional($post->updated_at)->format('d-m-Y')
             ];
 
 
@@ -307,12 +309,18 @@ class NgoController extends Controller
 
                 // Create User
                 Log::info('Creating user for NGO');
+
+                do {
+                    $uid = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+                } while (User::where('uid', $uid)->exists());
+
                 $userData = [
                     'name' => $request->input('ngo_name'),
                     'email' => $request->input('contact_email'),
                     'password' => Hash::make('@12345678'),
                     'account_type' => 3,
                     'is_admin_approved' => 1,
+                    'uid'=>$uid
                 ];
                 
                 Log::debug('User creation data', $userData);
@@ -591,7 +599,7 @@ class NgoController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'ngo_name' => 'required|string|max:255',
-                'contact_email' => 'required|email|max:255',
+                'contact_email' => 'nullable|email|max:255', // ✅ made optional (removed 'required')
                 'establishment' => 'nullable|integer',
                 'cat_id' => 'required|integer',
                 'languages' => 'nullable|array',
@@ -619,9 +627,11 @@ class NgoController extends Controller
                 'ngo_name.required' => 'The NGO name is required.',
                 'ngo_name.string' => 'The NGO name must be a valid string.',
                 'ngo_name.max' => 'The NGO name cannot exceed 255 characters.',
-                'contact_email.required' => 'The contact email is required.',
+                
+                // ✅ Removed contact_email.required message
                 'contact_email.email' => 'Please provide a valid email address.',
                 'contact_email.max' => 'The contact email cannot exceed 255 characters.',
+                
                 'cat_id.required' => 'The category ID is required.',
                 'cat_id.integer' => 'The category ID must be a valid number.',
                 'ngo_city.required' => 'The city is required.',
@@ -650,7 +660,7 @@ class NgoController extends Controller
             $ngo = Ngo::findOrFail($id);
 
             $ngo->ngo_name = $request->ngo_name;
-            $ngo->contact_email = $request->contact_email;
+            $ngo->contact_email = $request->contact_email; // can now be null
             $ngo->cat_id = $request->cat_id;
             $ngo->establishment = $request->establishment;
             $ngo->abn = $request->abn;
@@ -702,6 +712,7 @@ class NgoController extends Controller
             return response()->json(['error' => 'An error occurred while updating the NGO'], 500);
         }
     }
+
 
     public function viewNgo(Request $request){
         $breadcrumbs = [
@@ -822,7 +833,7 @@ class NgoController extends Controller
     {
         $result = ['data' => []];
     
-        $posts = User::select('users.id', 'users.uid' ,'users.name', 'users.email', 'users.is_admin_approved')
+        $posts = User::select('users.id', 'users.uid' ,'users.name', 'users.email', 'users.is_admin_approved','users.created_at','users.updated_at')
             ->where('account_type', 3)
             ->with(['ngoInfos:id,ngo_name,user_id'])
             ->orderBy('id', 'desc')
@@ -858,10 +869,12 @@ class NgoController extends Controller
             $result['data'][] = [
                 $dropdown,
                 $post->uid,
-                $post->name,
+                // $post->name,
                 $post->email,
                 $post->ngoInfos->ngo_name ?? '-',
                 $status,
+                optional($post->created_at)->format('d-m-Y'),
+                optional($post->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

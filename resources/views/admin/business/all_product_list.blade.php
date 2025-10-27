@@ -153,6 +153,43 @@
       align-items: center;     /* center vertically */
       gap: 8px;                /* spacing between buttons/icons */
     }
+    .price-negative {
+        color: #ff0000;                  /* Red text */
+        background-color: rgba(255,0,0,0.15); /* Light red background */
+        font-weight: 500;
+        padding: 2px 17px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 12px;
+    }
+
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px; /* space between dot and text */
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #fff; /* default text color, will override inline */
+    }
+
+    .category-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .price-positive {
+        color: #28a745; /* Green text */
+        background-color: rgba(40,167,69,0.15); /* Light green background */
+        font-weight: 500;
+        padding: 2px 17px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 12px;
+    }
 </style>
 <div class="search-lists">
     <div class="search-lists">
@@ -195,6 +232,8 @@
                                                     <th>Video URL</th>
                                                     <th>Status</th>
                                                     <th>Feature</th>
+                                                    <th>Created Date</th>
+                                                    <th>Updated Date</th>
                                                     <th class="text-right">Action</th>
                                                 </tr>
                                             </thead>
@@ -393,8 +432,94 @@
                 }
                 };
 
-            
+                async function downloadLabel(postId, title, businessName) {
+                    const oldLabel = document.getElementById("hidden-print-label");
+                    if (oldLabel) oldLabel.remove();
 
+                    const container = document.createElement("div");
+                    container.id = "hidden-print-label";
+                    container.style.position = "absolute";
+                    container.style.top = "0";
+                    container.style.left = "0";
+                    container.style.width = "50mm";
+                    container.style.height = "25mm";
+                    container.style.visibility = "hidden";
+                    container.style.zIndex = "-9999";
+                    container.style.background = "#fff";
+                    container.style.display = "flex";
+                    container.style.flexDirection = "column";
+                    container.style.justifyContent = "center";
+                    container.style.alignItems = "center";
+                    container.style.lineHeight = "1";
+                    container.style.fontFamily = "Arial, sans-serif";
+                    container.style.padding = "1mm";
+                    container.style.boxSizing = "border-box";
+                    container.style.overflow = "hidden";
+
+                    container.innerHTML = `
+                        <div style="width:100%; text-align:center; font-size:7pt; font-weight:bold;">
+                            Seller - ${businessName}
+                        </div>
+                        <div style="width:100%; text-align:center; font-size:8pt; font-weight:bold; margin-top:1mm;">
+                            ${title}
+                        </div>
+                        <hr style="width:90%; margin:1mm 0;">
+                        <svg id="barcode"></svg>
+                        <div style="text-align:center; font-size:6pt; margin:1mm 0;">${postId}</div>
+                        <div style="text-align:center; font-size:6pt;">DO NOT REMOVE!</div>
+                    `;
+
+                    document.body.appendChild(container);
+
+                    JsBarcode(container.querySelector("#barcode"), postId.toString(), {
+                        format: "CODE128",
+                        width: 2.2,
+                        height: 25,
+                        displayValue: false
+                    });
+
+                    const style = document.createElement("style");
+                    style.textContent = `
+                        @page {
+                            size: 50mm 25mm;
+                            margin: 0;
+                        }
+                        @media print {
+                            html, body {
+                                width: 50mm !important;
+                                height: 25mm !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                overflow: hidden !important;
+                            }
+                            body * {
+                                visibility: hidden !important;
+                            }
+                            #hidden-print-label, #hidden-print-label * {
+                                visibility: visible !important;
+                            }
+                            #hidden-print-label {
+                                position: absolute !important;
+                                top: 0;
+                                left: 0;
+                                width: 50mm !important;
+                                height: 25mm !important;
+                                overflow: hidden !important;
+                                page-break-before: auto !important;
+                                page-break-after: avoid !important;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    setTimeout(() => {
+                        window.print();
+                        window.onafterprint = () => {
+                            container.remove();
+                            style.remove();
+                        };
+                    }, 500);
+                }
         </script>
 
 

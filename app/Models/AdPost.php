@@ -79,6 +79,10 @@ class AdPost extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function BusinessInfos() {
+        return $this->hasOne(UserBusinessInfos::class,'user_id', 'user_id');
+    }
+
 
     /**
      * Delete image associated with this AdPost

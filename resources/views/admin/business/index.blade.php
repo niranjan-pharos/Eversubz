@@ -20,6 +20,8 @@
                                                 <th>Business Name</th>
                                                 <th>Request Status</th>
                                                 <th>Feature</th>
+                                                <th>Created Date</th>
+                                                <th>Updated Date</th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -150,6 +152,12 @@
                     }
                     , {
                         'data': 6
+                    }
+                    , {
+                        'data': 7
+                    }
+                    , {
+                        'data': 8
                     }
                 ],
                 'order': [],

@@ -20,7 +20,7 @@ class CustomPasswordReset extends ResetPasswordNotification
         $expiration = Carbon::now()->addMinutes(config('auth.passwords.' . config('auth.defaults.passwords') . '.expire', 60));
 
         return (new MailMessage)
-            ->view('vendor.mail.html.message', [
+            ->view('vendor.mail.html.password_reset', [
                 'url' => $url,
                 'expiration' => $expiration, // Pass the expiration variable
             ])

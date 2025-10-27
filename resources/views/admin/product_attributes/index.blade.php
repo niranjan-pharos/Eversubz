@@ -29,6 +29,26 @@
     .text-right {
         text-align: right;
     }
+
+    .price-negative {
+        color: #ff0000;                  /* Red text */
+        background-color: rgba(255,0,0,0.15); /* Light red background */
+        font-weight: 500;
+        padding: 2px 17px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 12px;
+    }
+
+    .price-positive {
+        color: #28a745; /* Green text */
+        background-color: rgba(40,167,69,0.15); /* Light green background */
+        font-weight: 500;
+        padding: 2px 17px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 12px;
+    }
 </style>
 
 <div class="search-lists">

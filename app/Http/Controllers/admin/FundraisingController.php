@@ -40,7 +40,7 @@ class FundraisingController extends Controller
     {
         $result = ['data' => []];
     
-        $fundraisings = Fundraising::select('id', 'main_image', 'title', 'slug', 'status', 'location', 'from_date_time', 'to_date_time', 'user_id', 'featured')
+        $fundraisings = Fundraising::select('id', 'main_image', 'title', 'slug', 'status', 'location', 'from_date_time', 'to_date_time', 'user_id', 'featured','created_at','updated_at')
             ->with(['user:id,name,username'])
             ->orderBy('id', 'desc')
             ->get();
@@ -87,6 +87,8 @@ class FundraisingController extends Controller
                 $dateTimeDisplay,
                 $featured,
                 $status,
+                optional($fundraising->created_at)->format('d-m-Y'),
+                optional($fundraising->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

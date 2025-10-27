@@ -39,8 +39,8 @@ class JobsCategoryController extends Controller
     {
         $result = ['data' => []];
     
-        $categories = JobCategory::select('id', 'name', 'slug', 'status')
-            ->orderBy('name', 'asc')
+        $categories = JobCategory::select('id', 'name', 'slug', 'status','created_at','updated_at')
+            ->orderBy('id', 'DESC')
             ->get();
     
         foreach ($categories as $key => $category) {
@@ -62,6 +62,8 @@ class JobsCategoryController extends Controller
                 $category->name,
                 $category->slug,
                 $status,
+                optional($category->created_at)->format('d-m-Y'),
+                optional($category->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

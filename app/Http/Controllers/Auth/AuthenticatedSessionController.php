@@ -98,8 +98,8 @@ class AuthenticatedSessionController extends Controller
      
     // for register
     public function register(Request $request)
-    {
-        Log::debug('Starting registration process', ['email' => $request->email, 'username' => $request->username]);
+    { 
+        Log::debug('Starting registration process', ['email' => $request->email, 'username' => $request->username, 'account_type' => $request->account_type]);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -138,13 +138,13 @@ class AuthenticatedSessionController extends Controller
 
             Log::debug('Welcome email queued', ['email' => $user->email]);
 
-            // Trigger email verification (sends verification email)
             event(new Registered($user));
 
             Log::debug('Registered event fired', ['user_id' => $user->id]);
 
             Auth::login($user);
 
+            
             Log::info('User logged in', ['user_id' => $user->id, 'auth_check' => Auth::check()]);
 
             DB::commit();

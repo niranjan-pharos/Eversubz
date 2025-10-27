@@ -394,6 +394,24 @@
 <nav class="mobile-nav">
     <div class="container">
         <div class="mobile-group">
+            <button type="button" class="mobile-widget back-btn" onclick="window.history.back()">
+              <svg class="w-5 h-5 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 18l-6-6 6-6" />
+              </svg>
+              <span>Back</span>
+            </button>
+
+            <a href="{{ route ('adsList') }}" class="mobile-widget ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312" />
+                </svg>
+                <span>Market</span>
+            </a>
+            
             <a href="{{ asset ('/') }}" class="mobile-widget">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -412,24 +430,15 @@
                 <span>Ad
                     Post</span>
             </a>
-            <a href="{{ route ('adsList') }}" class="mobile-widget ">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312" />
-                </svg>
-                <span>Market</span>
-            </a>
 
-
-            <a href="https://eversabz.com/events/events-list" class="mobile-widget ">
+            <!-- <a href="https://eversabz.com/events/events-list" class="mobile-widget ">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path
                         d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm-7-8h5v5h-5z" />
                 </svg>
 
                 <span>Events</span>
-            </a>
+            </a> -->
 
 
             <!--   <button class="mobile-widget  search-btn"
@@ -458,7 +467,6 @@
 
                 <span>Menu</span>
             </button>
-
         </div>
     </div>
 </nav>

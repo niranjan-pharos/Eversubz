@@ -30,7 +30,7 @@ src="{{ asset('assets/images/logo.png') }}" alt="logo"></a>
     </form>
     
     <style>
-    .overflow-hidden{background:rgb(255 255 255 / 70%)}
+    .overflow-hidden{background:#fff}
     .bg-gray-100{    background: linear-gradient(to right, #00c5fb 0%, #0253cc 100%);}
     label{    font-size: 20px ! IMPORTANT;
     font-weight: 700 !IMPORTANT;

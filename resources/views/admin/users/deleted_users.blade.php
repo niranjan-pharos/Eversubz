@@ -1,6 +1,50 @@
 @extends('admin.template.master')
 
 @section('content')
+<style>
+    .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Info (Normal User) */
+.bg-info-faint { background-color: #cff4fc; }
+.text-info-dark { color: #055160; }
+.bg-info-dark { background-color: #0dcaf0; }
+
+/* Primary (Business A/c) */
+.bg-primary-faint { background-color: #cfe2ff; }
+.text-primary-dark { color: #084298; }
+.bg-primary-dark { background-color: #0d6efd; }
+
+/* Success (NGO A/c) */
+.bg-success-faint { background-color: #d1e7dd; }
+.text-success-dark { color: #0f5132; }
+.bg-success-dark { background-color: #198754; }
+
+/* Warning (Candidate Profile) */
+.bg-warning-faint { background-color: #fff3cd; }
+.text-warning-dark { color: #664d03; }
+.bg-warning-dark { background-color: #ffc107; }
+
+/* Secondary (Unknown) */
+.bg-secondary-faint { background-color: #e2e3e5; }
+.text-secondary-dark { color: #383d41; }
+.bg-secondary-dark { background-color: #6c757d; }
+
+</style>
 <div class="search-lists">
     <div class="search-lists">
         <div class="tab-content">

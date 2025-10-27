@@ -1,5 +1,19 @@
 @extends('admin.template.master')
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.1/css/buttons.dataTables.min.css">
+<script src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 @section('content')
 <div class="search-lists">
     <div class="search-lists">
@@ -82,123 +96,143 @@
             </div>
         </div>
         <!-- End Response Modal -->
+
         <script type="text/javascript">
-    var base_url = "{{ url('/admin/') }}";
-    var donationTable;
+            var donationTable = null;
+        
+            function buildDonationTable() {
+                const urlSegments = window.location.href.split('/').filter(Boolean);
+                const fundraising_id = urlSegments.pop();
 
-    $(document).ready(function () {
-        const urlSegments = window.location.href.split('/').filter(Boolean);
-        const fundraising_id = urlSegments.pop();
+                if ($.fn.DataTable.isDataTable('#donationTable')) {
+                    $('#donationTable').DataTable().clear().destroy();
+                    $('#donationTable').empty();
+                }
 
-        $('#donationTable').DataTable({
-            ajax: "{{ route('adminDonationList') }}" + "?fundraising_id=" + fundraising_id,
-            order: [],
-            columns: [
-                { name: 'number' },
-                { name: 'title' },
-                { name: 'name' },
-                { name: 'email' },
-                { name: 'amount' },
-                { name: 'tip' },
-                { name: 'total_amount' },
-                { name: 'country' },
-                { name: 'status' },
-                { name: 'created_at' },
-                { name: 'action', orderable: false, searchable: false }
-            ],
-            error: function(xhr, error, thrown) {
-                console.error('DataTables Ajax Error:', xhr.responseText);
+                $('#donationTable').DataTable({
+                    ajax: {
+                        url: "{{ route('adminDonationList') }}" + "?fundraising_id=" + fundraising_id,
+                        dataSrc: 'data',
+                        error: function (xhr, error, thrown) {
+                            console.error('DataTables Ajax Error:', xhr?.responseText || error || thrown);
+                        }
+                    },
+                    order: [],
+                    columns: [
+                        { title: "Number" },
+                        { title: "Title" },
+                        { title: "Name" },
+                        { title: "Email" },
+                        { title: "Amount" },
+                        { title: "Tip" },
+                        { title: "Total Amount" },
+                        { title: "Country" },
+                        { title: "Status" },
+                        { title: "Created At" },
+                        { title: "Action" }
+                    ],
+                    columnDefs: [
+                        {
+                            targets: -1,
+                            orderable: false,
+                            searchable: false,
+                            className: 'no-export text-right'
+                        }
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            extend: 'csvHtml5',
+                            text: 'Download CSV',
+                            title: 'Donations',
+                            className: 'btn btn-sm btn-primary',
+                            exportOptions: { columns: ':visible:not(.no-export)' }
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: 'Download Excel',
+                            title: 'Donations',
+                            className: 'btn btn-sm btn-success',
+                            exportOptions: { columns: ':visible:not(.no-export)' }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'Download PDF',
+                            title: 'Donations',
+                            orientation: 'landscape',
+                            pageSize: 'A4',
+                            className: 'btn btn-sm btn-danger',
+                            exportOptions: { columns: ':visible:not(.no-export)' }
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print Table',
+                            className: 'btn btn-sm btn-secondary',
+                            exportOptions: { columns: ':visible:not(.no-export)' }
+                        }
+                    ]
+                });
             }
-        });
 
-
-        $('body').on('click', '.change-status', function () {
-            let isChecked = $(this).is(':checked');
-            let id = $(this).data('id');
-            $.ajax({
-                url: '{{ route('fundraisingChangeStatus') }}',
-                method: 'PUT',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    status: isChecked ? 'active' : 'inactive',
-                    id: id
-                },
-                success: function (response) {
-                    toastr.success(response.message);
-                },
-                error: function (xhr) {
-                    console.error(xhr.responseText);
-                    toastr.error('Failed to change status');
-                }
+            $(document).ready(function () {
+                buildDonationTable();
+        
+                $('body').on('click', '.change-status', function () {
+                    let isChecked = $(this).is(':checked');
+                    let id = $(this).data('id');
+                    $.ajax({
+                        url: '{{ route('fundraisingChangeStatus') }}',
+                        method: 'PUT',
+                        data: { "_token": "{{ csrf_token() }}", status: isChecked ? 'active' : 'inactive', id },
+                        success: function (response) {
+                            toastr.success(response.message);
+                            if (donationTable) donationTable.ajax.reload(null, false);
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            toastr.error('Failed to change status');
+                        }
+                    });
+                });
+        
+                $('body').on('click', '.featured-status', function () {
+                    let isChecked = $(this).is(':checked');
+                    let id = $(this).data('id');
+                    $.ajax({
+                        url: '{{ route('fundraisingChangeFeatured') }}',
+                        method: 'PUT',
+                        data: { "_token": "{{ csrf_token() }}", status: isChecked, id },
+                        success: function (response) {
+                            toastr.success(response.message);
+                            if (donationTable) donationTable.ajax.reload(null, false);
+                        }
+                    });
+                });
+        
+                $('body').on('click', '.delete-fundraising', function () {
+                    let slug = $(this).data('slug');
+                    $('#delete_category').modal('show');
+                    $('.continue-btn').data('slug', slug);
+                });
+        
+                $('.continue-btn').on('click', function () {
+                    let slug = $(this).data('slug');
+                    $.ajax({
+                        url: '{{ route('fundraisingDestroyBySlug') }}',
+                        method: 'DELETE',
+                        data: { "_token": "{{ csrf_token() }}", slug },
+                        success: function (response) {
+                            toastr.success(response.message);
+                            $('#delete_category').modal('hide');
+                            if (donationTable) donationTable.ajax.reload(null, false);
+                        }
+                    });
+                });
             });
-        });
-
-        $('body').on('click', '.featured-status', function () {
-            let isChecked = $(this).is(':checked');
-            let id = $(this).data('id');
-            $.ajax({
-                url: '{{ route('fundraisingChangeFeatured') }}',
-                method: 'PUT',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    status: isChecked,
-                    id: id
-                },
-                success: function (response) {
-                    console.log(response);
-                    toastr.success(response.message);
-                }
-            });
-        });
-
-        $('body').on('click', '.delete-fundraising', function () {
-            let slug = $(this).data('slug');
-            $('#delete_category').modal('show');
-            $('.continue-btn').data('slug', slug);
-        });
-
-        $('.continue-btn').on('click', function () {
-            let slug = $(this).data('slug');
-            $.ajax({
-                url: '{{ route('fundraisingDestroyBySlug') }}',
-                method: 'DELETE',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    slug: slug
-                },
-                success: function (response) {
-                    console.log(response);
-                    toastr.success(response.message);
-                    $('#delete_category').modal('hide');
-                    donationTable.ajax.reload();
-                }
-            });
-        });
-    });
-
-    function removeFunc(slug) {
-        $('#delete_category').modal('show');
-        $('.continue-btn').data('slug', slug);
-    };
-
-    function viewFunc(id) {
-        console.log(id);
-        var url = "{{ route('adminfundraisingShow', ':id') }}";
-        url = url.replace(':id', id); 
-        console.log(url); 
-        window.open(url, '_blank');
-    };
-
-    function ViewDonation(id) {
-        console.log(id);
-        var url = "{{ route('adminDonationShow', ':id') }}";
-        url = url.replace(':id', id); 
-        console.log(url); 
-        window.open(url, '_blank');
-    }
-</script>
-
-
+        </script>
+        
+        
+        
         <style>
         .custom-table {
             width: 100%;

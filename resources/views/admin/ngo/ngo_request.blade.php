@@ -19,6 +19,8 @@
                                                                                         <th>Email</th>
                                                                                         <th>Business Name</th>
                                                                                         <th>Request Status</th>
+                                                                                        <th>Created Date</th>
+                                                                                        <th>Updated Date</th>
                                                                                         <th class="text-right">Action
                                                                                         </th>
                                                                                 </tr>
@@ -148,6 +150,14 @@
                         },
                         {
                                 'data': 5
+                        }
+                        ,
+                        {
+                                'data': 6
+                        }
+                        ,
+                        {
+                                'data': 7
                         }
                         ],
                         'order': [],

@@ -48,7 +48,7 @@ class EventController extends Controller
     public function fetchTableData(){
         $result = ['data' => []]; 
     
-        $events = Event::select('id', 'main_image', 'title', 'slug', 'host_name', 'status', 'location', 'from_date_time', 'to_date_time', 'user_id', 'feature')
+        $events = Event::select('id', 'main_image', 'title', 'slug', 'host_name', 'status', 'location', 'from_date_time', 'to_date_time', 'user_id', 'feature','created_at','updated_at')
             ->with(['user:id,name'])
             ->orderBy('id', 'desc')
             ->get();
@@ -96,6 +96,8 @@ class EventController extends Controller
                 $dateTimeDisplay,
                 $feature,
                 $status,
+                optional($event->created_at)->format('d-m-Y'),
+                optional($event->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

@@ -162,13 +162,24 @@
             <!-- Message start -->
             <table style="width:100% !important;border-collapse:collapse;">
             <tr>
-                    <td  class="masthead"
-                        style="text-align:center; padding-top: 80px; padding-bottom: 30px; padding-right: 0; padding-left: 0;
-                        background-color: #0071c1; background-image: url('{{ asset('uploads/common/logo.png') }}');
-                        background-repeat: no-repeat; background-position: center 15px; background-attachment: scroll;
-                        color: white; border-radius: 10px 10px 0 0;">
-                           <a href="#"><img class="email-logo" src="{{ asset('assets/images/logo.png') }}" alt="logo" style="min-width: 125px;"></a>
-                        <h1 style="line-height: 1.25; font-size: 32px; margin-top: 0 !important; margin-bottom: 0 !important;
-                        margin-right: auto !important; margin-left: auto !important; max-width: 90%;    padding-top: 20px;">Welcome to Eversabz</h1>
+                    <td class="masthead"
+                        style="text-align: center; padding-top: 80px; padding-bottom: 40px; 
+                               background-color: #0071c1; color: white; border-radius: 10px 10px 0 0;">
+                        
+                        <!-- White Card for Logo -->
+                        <div style="display: inline-block; background: #fff; border-radius: 12px; margin-bottom: 20px;
+                                    padding: 15px 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                            <a href="#" style="display: inline-block;">
+                                <img class="email-logo" src="{{ asset('assets/images/logo.png') }}" 
+                                     alt="logo" 
+                                     style="width: 120px; height: auto; display: block;">
+                            </a>
+                        </div>
+
+                        <!-- Heading -->
+                        <h1 style="line-height: 1.25; font-size: 32px; margin-top: 20px; color: #fff;
+                                   margin-bottom: 0; max-width: 90%; margin-left: auto; margin-right: auto;">
+                            Welcome to Eversabz
+                        </h1>
                     </td>
                 </tr> 

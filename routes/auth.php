@@ -22,22 +22,24 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.store');
 });
 
+
 Route::middleware('auth')->group(function () {
-    // 1. Show “Resend Verification” notice
     Route::get('verify-email', EmailVerificationPromptController::class)
-         ->name('verification.notice');
+        ->name('verification.notice');
 
-    // 2. Handle verification link click
-    Route::get('email/verify/{id}/{hash}', 
-        [VerifyEmailController::class, '__invoke']
-    )->middleware(['signed','throttle:6,1'])
-     ->name('verification.verify');
+    Route::get('email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+        ->middleware(['signed', 'throttle:6,1', 'probe'])
+        ->name('verification.verify');
 
-    // 3. Resend verification link
-    Route::post('email/verification-notification', 
-        [EmailVerificationNotificationController::class, 'store']
-    )->middleware('throttle:6,1')
-     ->name('verification.send');
+    Route::post('email/verification-notification',
+        [EmailVerificationNotificationController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    Route::post('email/account-verification-notification',
+        [EmailVerificationNotificationController::class, 'storeAjaxSubmission'])
+        ->middleware('throttle:6,1')
+        ->name('verification.sendAjax');
 
     // 4. Confirm password
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])

@@ -122,7 +122,7 @@ class AdminController extends Controller
 
     public function fetchTableData(){
 
-        $announcements = AdminMessage::select('id', 'heading','description', 'orderby','status')->get();
+        $announcements = AdminMessage::select('id', 'heading','description', 'orderby','status','created_at','updated_at')->orderBy('id','DESC')->get();
 
         foreach ($announcements as $key => $announcement) {
             $buttons = ''; $status  =''; $icon= '';
@@ -145,6 +145,8 @@ class AdminController extends Controller
                 $announcement->description,
                 $announcement->orderby,
                 $status,
+                optional($announcement->created_at)->format('d-m-Y'),
+                optional($announcement->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

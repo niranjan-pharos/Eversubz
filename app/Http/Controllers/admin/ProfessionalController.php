@@ -52,6 +52,7 @@ class ProfessionalController extends Controller
                 'candidateProfile.candidateLanguages',
                 'candidateProfile.categories',
             ])
+            ->orderBy('id','DESC')
             ->get();
 
             foreach ($professionals as $professional) {
@@ -78,6 +79,8 @@ class ProfessionalController extends Controller
                             data-id="' . $professional->id . '" 
                             ' . ($professional->status === 'active' ? 'checked' : '') . '>
                     </div>',
+                    optional($professional->created_at)->format('d-m-Y'),
+                    optional($professional->updated_at)->format('d-m-Y'),
                     $buttons,
                 ];
             }            
@@ -196,6 +199,10 @@ class ProfessionalController extends Controller
 
             $validatedData = $validator->validated();
 
+            do {
+                $uid = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+            } while (User::where('uid', $uid)->exists());
+
             $user = User::create([
                 'username' => $validatedData['username'],
                 'name' => $validatedData['name'],
@@ -209,6 +216,7 @@ class ProfessionalController extends Controller
                 'permanent_country' => $validatedData['permanent_country'] ?? null,
                 'account_type' => 4,
                 'is_admin_approved' => 1,
+                'uid'=>$uid
             ]);
 
             if ($request->hasFile('profile_image')) {

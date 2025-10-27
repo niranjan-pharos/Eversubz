@@ -112,9 +112,8 @@
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="form-group">
-                                                <label class="col-form-label">Email :<sup
-                                                        class="text-danger">*</sup></label>
-                                                <input class="form-control" type="text" required name="contact_email"
+                                                <label class="col-form-label">Email :</label>
+                                                <input class="form-control" type="text" name="contact_email"
                                                     value="{{ $ngoInfo->contact_email }}">
                                             </div>
                                         </div>

@@ -1,6 +1,35 @@
 @extends('admin.template.master')
 
 @section('content')
+
+<style>
+    .business-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.business-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Everstore Australia - Blue */
+.business-everstore {
+    background-color: #e3f2fd; /* faint blue */
+    color: #0d6efd;            /* dark blue */
+}
+.business-everstore .business-dot {
+    background-color: #0d6efd; /* blue dot */
+}
+
+</style>
 <div class="search-lists">
     <div class="search-lists">
         <div class="tab-content">
@@ -23,6 +52,8 @@
                                             <th>Name</th>
                                             <th>Slug</th>
                                             <th>Status</th>
+                                            <th>Created Date</th>
+                                            <th>Updated Date</th>
                                             <th class="text-right">Action</th>
                                         </tr>
                                     </thead>
@@ -244,6 +275,14 @@
                     },
                     {
                         data: 4,
+                        name: 'created_at'
+                    },
+                    {
+                        data: 5,
+                        name: 'updated_at'
+                    },
+                    {
+                        data: 6,
                         name: 'actions',
                         orderable: false,
                         searchable: false

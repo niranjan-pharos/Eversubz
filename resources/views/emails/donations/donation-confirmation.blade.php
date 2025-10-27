@@ -2,74 +2,213 @@
     use Carbon\Carbon;
 @endphp
 
-<table class="body-wrap" style="width:97% !important;margin:0 auto;height:100%;background-color:#f9f9f9;">
-    <tr>
-        <td class="container" style="display:block !important;clear:both !important;margin-top:20px !important;margin-bottom:0 !important;margin-right:auto !important;margin-left:auto !important;max-width:625px !important;">
-            <table style="width:100% !important; border-collapse:collapse;">
-                <tr>
-                    <td class="masthead" style="">
-                        <img class="email-logo" src="https://eversabz.com/assets/images/logo.png" alt="logo" style="width: 250px; border-radius: 10px; padding: 5px;margin: auto;display: flex;">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content" style="padding-bottom: 30px;background-color:white;">
-                        <h2 style="margin: 0 0 0.5rem 0; line-height: 1.25; color: #000000; text-align: center; font-size: 1rem; font-weight: 500;margin: 35px 65px 0px;">
-                            Hello, {{ $donation->name }}! <br />Thank you for your generous donation.
-                        </h2>
-                        <div style="background: #f9f9f9;margin: 35px;padding: 20px;">
-                            <p style="color: #000000;text-align: center;font-size: 23px;"><strong style="font-weight: 500;">Donation Summary</strong></p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Donation Confirmation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #333;
+        }
 
-                            <p style="text-align: center;margin: 0px;">
-                                <strong style="font-weight: 500;">Donation Number:</strong> {{ $donation->donation_number }}
-                            </p>
+        .email-wrapper {
+            width: 100%;
+            background-color: #f3f4f6;
+            padding: 40px 0;
+        }
 
-                            <p style="text-align: center;margin: 0px;">
-                                <strong style="font-weight: 500;">Amount Donated:</strong> ${{ number_format($donation->amount, 2) }}
-                            </p>
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
 
-                            <p style="text-align: center;margin: 0px;">
-                                <strong style="font-weight: 500;">Tip:</strong> ${{ number_format($donation->tip, 2) }}
-                            </p>
+        /* Header */
+        .email-header {
+            background: #2d69b3; /* Blue header */
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
 
-                            <p style="text-align: center;margin: 0px;">
-                                <strong style="font-weight: 500;">Transaction Fee:</strong> ${{ number_format($donation->transaction_fee, 2) }}
-                            </p>
+        .logo-card {
+            background: #ffffff;
+            display: inline-block;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
 
-                            <p style="text-align: center;margin: 0px;">
-                                <strong style="font-weight: 500;">Total Amount:</strong> ${{ number_format($donation->total_amount, 2) }}
-                            </p>
+        .logo-card img {
+            width: 180px;
+            display: block;
+        }
 
-                            <p style="text-align: center;margin: 20px 0;">
-                                <strong style="font-weight: 500;">Date:</strong> {{ Carbon::parse($donation->created_at)->format('F j, Y') }}
-                            </p>
+        .email-content {
+            padding: 35px 40px;
+        }
 
-                            <hr style="margin: 20px;color: #ddd;border: 1px solid;">
+        h2 {
+            color: #111827;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-                            <p style="color: #000000; font-size: 14px;margin: 5px 5px 15px 20px;">
-                                <strong style="font-weight: 500;">Message:</strong> {{ $donation->message ?? 'No message provided.' }}
-                            </p>
+        /* Donation summary table */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0 30px;
+            background: #f9fafb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-                            @if($donation->anonymous)
-                                <p style="color: #000000; font-size: 14px;margin: 5px 5px 15px 20px;">
-                                    <strong style="font-weight: 500;">This donation was made anonymously.</strong>
-                                </p>
-                            @endif
-                        </div>
+        .summary-table th,
+        .summary-table td {
+            padding: 12px 18px;
+            font-size: 15px;
+        }
 
-                        <div style="background: #f9f9f9;margin: 35px;padding: 20px 25px 20px;">
-                            <p style="color: #000000; text-align: center; font-size: 14px;">Thank you again for your generous support! Your contribution helps us achieve our mission.</p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content" style="background-color:white; padding:20px;">
-                        <p style="font-size:14px;">If you have any questions, feel free to reply to this email and we will get back to you.</p>
-                        <p style="font-size:14px;">Thanks again for choosing us!</p>
-                        <p style="font-size:14px;">Thanks, <br />Eversabz</p>
-                        <p style="font-size:14px;">For any support: <a href="{{ url('contactus') }}" style="color:#050505; text-decoration:none;">Contact Us</a></p>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+        .summary-table th {
+            text-align: left;
+            background: #eef2ff;
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+
+        .summary-table td {
+            border-bottom: 1px dashed #d1d5db; /* dashed bottom border */
+        }
+
+        .summary-table td:last-child {
+            text-align: right;
+            color: #111827;
+            font-weight: 500;
+        }
+
+        .message-box {
+            background: #f9fafb;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .footer-note {
+            background-color: #eef2ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #1e3a8a;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .footer a {
+            color: #0056b3;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+
+            <!-- HEADER -->
+            <div class="email-header">
+                <div class="logo-card">
+                    <img src="https://eversabz.com/assets/images/logo.png" alt="Eversabz Logo">
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="email-content">
+                <h2>Hello {{ $donation->name }},<br>Thank You for Your Generous Donation!</h2>
+
+                <table class="summary-table">
+                    <tr>
+                        <th>Donation Number</th>
+                        <td>{{ $donation->donation_number }}</td>
+                    </tr>
+                    <tr>
+                        <th>Amount Donated</th>
+                        <td>${{ number_format($donation->amount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tip</th>
+                        <td>${{ number_format($donation->tip, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Transaction Fee</th>
+                        <td>${{ number_format($donation->transaction_fee, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Amount</th>
+                        <td>${{ number_format($donation->total_amount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date</th>
+                        <td>{{ Carbon::parse($donation->created_at)->format('F j, Y') }}</td>
+                    </tr>
+                </table>
+
+                <div class="message-box">
+                    <strong>Message:</strong> {{ $donation->message ?? 'No message provided.' }}
+                </div>
+
+                @if($donation->anonymous)
+                    <div class="message-box" style="margin-top:10px;">
+                        <strong>This donation was made anonymously.</strong>
+                    </div>
+                @endif
+
+                <div class="footer-note" style="margin-top:30px;">
+                    Thank you again for your generosity 🌿<br>
+                    Your contribution helps us make a positive impact every day.
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">
+                <p>If you have any questions, just reply to this email — we’d love to help.</p>
+                <p>Warm regards,<br><strong>Eversabz Team</strong></p>
+                <p>Need assistance? <a href="{{ url('contactus') }}">Contact Us</a></p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

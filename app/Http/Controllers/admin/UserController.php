@@ -36,7 +36,7 @@ class UserController extends Controller
         $result = ['data' => []];
 
         $users = User::select('id', 'uid','name', 'username', 'account_type', 'email', 'phone', 'created_at', 'status', 'is_admin_approved', 'is_module_visible')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         $accountTypeMap = [
@@ -73,13 +73,26 @@ class UserController extends Controller
                     <input class="form-check-input module-enable-switch" type="checkbox" role="switch" id="moduleVisible' . $user->id . '" ' . $moduleVisible . ' data-user-id="' . $user->id . '">
                 </div>';
 
+                $accountTypeMap = [
+                    1 => ['label' => 'Normal User',     'class' => 'info'],
+                    2 => ['label' => 'Business A/c',    'class' => 'primary'],
+                    3 => ['label' => 'NGO A/c',         'class' => 'success'],
+                    4 => ['label' => 'Candidate Profile','class' => 'warning'],
+                ];
+
+                $accountType = $accountTypeMap[$user->account_type] ?? ['label' => 'Unknown', 'class' => 'secondary'];
+
+                $accountTypeHtml = '<span class="status-badge bg-' . $accountType['class'] . '-faint text-' . $accountType['class'] . '-dark">
+                                       <span class="status-dot bg-' . $accountType['class'] . '-dark"></span>' . $accountType['label'] . '
+                                    </span>';
+
+
             $result['data'][$key] = [
                 $buttons, 
+                optional($user->created_at)->format('d-m-Y'),
                 $user->uid,
-                $user->name,
-                $user->username,
-                $accountTypeName,
                 $user->email,
+                $accountTypeHtml,
                 $user->phone,
                 $statusSwitch,
                 $adminApprovedSwitch,
@@ -272,6 +285,19 @@ class UserController extends Controller
         foreach ($users as $key => $user) {
             $accountTypeName = $accountTypeMap[$user->account_type] ?? 'Unknown';
 
+             $accountTypeMap = [
+                    1 => ['label' => 'Normal User',     'class' => 'info'],
+                    2 => ['label' => 'Business A/c',    'class' => 'primary'],
+                    3 => ['label' => 'NGO A/c',         'class' => 'success'],
+                    4 => ['label' => 'Candidate Profile','class' => 'warning'],
+                ];
+
+                $accountType = $accountTypeMap[$user->account_type] ?? ['label' => 'Unknown', 'class' => 'secondary'];
+
+                $accountTypeHtml = '<span class="status-badge bg-' . $accountType['class'] . '-faint text-' . $accountType['class'] . '-dark">
+                                       <span class="status-dot bg-' . $accountType['class'] . '-dark"></span>' . $accountType['label'] . '
+                                    </span>';
+
             $is_deleted = !empty($user->deleted_at) ? '' : 'checked';
             $restoreSwitch = '
                 <div class="form-check form-switch">
@@ -284,7 +310,7 @@ class UserController extends Controller
                 $user->uid,
                 $user->name,
                 $user->username,
-                $accountTypeName ?? 'Unknown',
+                $accountTypeHtml,
                 $user->email,
                 $user->phone,
                 $restoreSwitch,

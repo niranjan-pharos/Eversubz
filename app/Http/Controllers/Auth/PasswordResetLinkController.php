@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 use App\Notifications\CustomPasswordReset;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 
 class PasswordResetLinkController extends Controller
 {
@@ -29,6 +30,8 @@ class PasswordResetLinkController extends Controller
                 $user->notify(new \App\Notifications\CustomPasswordReset($token));
             }
         );
+
+
 
         if ($request->expectsJson()) {
             return response()->json([

@@ -176,7 +176,7 @@
                 @if($user->account_type == 3)
                 <div class="account-card ">
                     <div class="account-title">
-                        <h3>NGO Main Infoo</h3><a href="{{ route('ngo.other') }}">Edit</a>
+                        <h3>NGO Main Info</h3><a href="{{ route('ngo.other') }}">Edit</a>
                     </div>
                     <ul class="account-card-list">
                         <li>

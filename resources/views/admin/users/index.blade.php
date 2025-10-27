@@ -1,6 +1,50 @@
 @extends('admin.template.master')
 
 @section('content')
+<style>
+    .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 12px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Info (Normal User) */
+    .bg-info-faint { background-color: #cff4fc; }
+    .text-info-dark { color: #055160; }
+    .bg-info-dark { background-color: #0dcaf0; }
+
+    /* Primary (Business A/c) */
+    .bg-primary-faint { background-color: #cfe2ff; }
+    .text-primary-dark { color: #084298; }
+    .bg-primary-dark { background-color: #0d6efd; }
+
+    /* Success (NGO A/c) */
+    .bg-success-faint { background-color: #d1e7dd; }
+    .text-success-dark { color: #0f5132; }
+    .bg-success-dark { background-color: #198754; }
+
+    /* Warning (Candidate Profile) */
+    .bg-warning-faint { background-color: #fff3cd; }
+    .text-warning-dark { color: #664d03; }
+    .bg-warning-dark { background-color: #ffc107; }
+
+    /* Secondary (Unknown) */
+    .bg-secondary-faint { background-color: #e2e3e5; }
+    .text-secondary-dark { color: #383d41; }
+    .bg-secondary-dark { background-color: #6c757d; }
+
+</style>
 <div class="search-lists">
     <div class="search-lists">
         <div class="tab-content">
@@ -15,11 +59,10 @@
                                     <thead>
                                         <tr>
                                             <th>Action</th>
+                                            <th>Created Date</th>
                                             <th>User Id</th>
-                                            <th>Name</th>
-                                            <th>Username</th>
-                                            <th>Account Type</th>
                                             <th>Email</th>
+                                            <th>Account Type</th>
                                             <th>Phone Number</th>
                                             <th>Status</th>
                                             <th>Admin Approved</th>
@@ -137,18 +180,16 @@ $(document).ready(function() {
             'url': "{{ route('userList') }}", 
             'dataSrc': 'data'
         },
-        'order': [[1, 'desc']],
         columns: [
             { data: 0, name: 'Action', className: 'text-center' },
-            { data: 1, name: 'ID' },
-            { data: 2, name: 'Name' },
-            { data: 3, name: 'Username' },
+            { data: 1, name: 'Created Date' },
+            { data: 2, name: 'UserID' },
+            { data: 3, name: 'Email' },
             { data: 4, name: 'Account Type' },
-            { data: 5, name: 'Email' },
-            { data: 6, name: 'Phone' },
-            { data: 7, name: 'Status' },
-            { data: 8, name: 'Admin Approved' },
-            { data: 9, name: 'Module Visible' }
+            { data: 5, name: 'Phone' },
+            { data: 6, name: 'Status' },
+            { data: 7, name: 'Admin Approved' },
+            { data: 8, name: 'Module Visible' }
         ]
     });
 });

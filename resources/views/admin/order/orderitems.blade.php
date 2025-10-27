@@ -86,6 +86,162 @@
         color: black !important;
     }
 
+    .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-success {
+    background-color: #d4edda; /* light green */
+    color: #28a745;
+}
+
+.status-success .status-dot {
+    background-color: #28a745; /* dark green */
+}
+
+.status-failed {
+    background-color: #f8d7da; /* light red */
+    color: #dc3545;
+}
+
+.status-failed .status-dot {
+    background-color: #dc3545; /* dark red */
+}
+
+.status-pending {
+    background-color: #fff3cd; /* light yellow */
+    color: #856404;
+}
+
+.status-pending .status-dot {
+    background-color: #856404; /* dark yellow */
+}
+
+.item-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.item-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.item-status-pending {
+    background-color: #fff3cd; /* light yellow */
+    color: #ffc107;            /* dark yellow/brown */
+}
+.item-status-pending .item-status-dot {
+    background-color: #ffc107; /* dark yellow */
+}
+
+.item-status-success {
+    background-color: #d4edda; /* light green */
+    color: #28a745;
+}
+.item-status-success .item-status-dot {
+    background-color: #28a745;
+}
+
+.item-status-failed {
+    background-color: #f8d7da; /* light red */
+    color: #dc3545;
+}
+.item-status-failed .item-status-dot {
+    background-color: #dc3545;
+}
+
+.shipping-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.shipping-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Eversabz - Blue */
+.shipping-eversabz {
+    background-color: #e3f2fd; /* light blue */
+    color: #0d6efd;            /* bootstrap blue */
+}
+.shipping-eversabz .shipping-dot {
+    background-color: #0d6efd; /* dark blue */
+}
+
+/* Other - Grey */
+.shipping-default {
+    background-color: #f1f3f4; /* light grey */
+    color: #495057;            /* dark grey */
+}
+.shipping-default .shipping-dot {
+    background-color: #495057; /* dark grey */
+}
+.business-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.business-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Everstore Australia - Blue */
+.business-everstore {
+    background-color: #e3f2fd; /* faint blue */
+    color: #0d6efd;            /* dark blue */
+}
+.business-everstore .business-dot {
+    background-color: #0d6efd; /* blue dot */
+}
+
+/* Default - Grey */
+.business-default {
+    background-color: #f1f3f4; /* faint grey */
+    color: #495057;            /* dark grey */
+}
+.business-default .business-dot {
+    background-color: #495057; /* grey dot */
+}
+
+
+
 
 
 </style>
@@ -103,7 +259,7 @@
                                 <table class="table custom-table mb-0" id="orderTable">
                                     <thead>
                                         <tr>
-                                            <th style="background-color: #007bff36 !important">Order Id</th>
+                                            <th>Order Id</th>
                                             <th>Date</th>
                                             <!-- <th>User ID </th> -->
                                             <th>Product (Total Count)</th>
@@ -112,6 +268,8 @@
                                             <th>Payment Status</th>
                                             <th>Order Status</th>
                                             <th>Delivary Option</th>
+                                            <th>Created Date</th>
+                                            <th>Updated Date</th>
                                             <th class="text-right">Action</th>
                                         </tr>
                                     </thead>
@@ -218,7 +376,6 @@
     var orderTable;
     $(document).ready(function() {
         orderTable = $('#orderTable').DataTable({
-        processing: true,
         serverSide: true,
         ajax: '{{ route('orderitems.data') }}',
         order: [[0, 'desc']],

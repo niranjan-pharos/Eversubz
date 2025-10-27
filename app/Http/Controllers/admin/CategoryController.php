@@ -34,7 +34,7 @@ class CategoryController extends Controller
     public function fetchTableData(){
         $result = ['data' => []];
 
-        $categories = Category::select('id', 'icon','name', 'slug','status')->get();
+        $categories = Category::select('id', 'icon','name', 'slug','status','created_at','updated_at')->orderBy('id','DESC')->get();
 
         foreach ($categories as $key => $category) {
             $buttons = ''; $status  =''; $icon= '';
@@ -58,6 +58,8 @@ class CategoryController extends Controller
                 $category->name,
                 $category->slug,
                 $status,
+                optional($category->created_at)->format('d-m-Y') ?? '-',
+                optional($category->updated_at)->format('d-m-Y') ?? '-',
                 $buttons,
             ];
         }
@@ -87,7 +89,7 @@ class CategoryController extends Controller
 
         $result = ['data' => []];
 
-        $categories = BusinessCategory::select('id', 'icon','name', 'slug','status')->orderBy('id', 'desc')->get();
+        $categories = BusinessCategory::select('id', 'icon','name', 'slug','status','created_at','updated_at')->orderBy('id', 'desc')->get();
 
         foreach ($categories as $key => $category) {
             $buttons = ''; $status  =''; $icon= '';
@@ -111,6 +113,8 @@ class CategoryController extends Controller
                 $category->name,
                 $category->slug,
                 $status,
+                optional($category->created_at)->format('d-m-Y'),
+                optional($category->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

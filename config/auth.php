@@ -120,4 +120,8 @@ return [
 
     'password_timeout' => 10800,
 
+    'verification' => [
+        'expire' => 1440, // minutes = 24h (or 2880 for 48h)
+    ],
+
 ];

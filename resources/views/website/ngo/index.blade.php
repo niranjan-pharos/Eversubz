@@ -19,6 +19,38 @@
             border: 1px solid #eeeeee;
         }
 
+        /* Spinner base */
+        .spinner-border {
+          display: inline-block;
+          width: 2rem;      /* default size */
+          height: 2rem;
+          vertical-align: text-bottom;
+          border: 0.25em solid currentColor;
+          border-right-color: transparent;
+          border-radius: 50%;
+          animation: spinner-border 0.75s linear infinite;
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Small spinner */
+        .spinner-border-sm {
+          width: 1rem;
+          height: 1rem;
+          border-width: 0.2em;
+        }
+
+        /* Spinner animation */
+        @keyframes spinner-border {
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+
         .col-lg-4.col-xl-3 {
             padding: 0px;
         }
@@ -67,12 +99,6 @@
         }
 
 
-        .register-btn {
-            background: linear-gradient(135deg, #2c54a4, #28a745);
-            padding: 38px;
-            height: 47px;
-        }
-
         .row.justify-content-center {
             display: flex;
             justify-content: center;
@@ -94,9 +120,9 @@
 
         .register-btn {
             background: linear-gradient(135deg, #2c54a4, #28a745);
-            padding: 21px 10px 50px 10px;
+            padding: 15px 10px 35px 10px;
             width: 100%;
-            height: 23px;
+            height: 48px;
             color: white;
         }
 
@@ -216,6 +242,7 @@
         .category-ngo-list ul li a {
             font-size: 14px;
             color: #000 !important;
+            background: #fff;
             border-bottom: 1px solid !important
         }
 
@@ -320,6 +347,11 @@
     .load-more-btn:hover span {
         transform: translateX(-8px); /* text moves right → left */
     }
+
+    .card-media img{
+        background: #fff;
+        border-bottom: 1px solid #eee;
+    }
     </style>
 <section class="main-section2">
     <div class="2xl:max-w-[1220px] max-w-[1065px] mx-auto  mb-10">
@@ -327,16 +359,19 @@
             @if (Auth::user()->hasVerifiedEmail())
             
                 <div class="page-heading">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mobileviewhidesection">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mobileviewhidesection mb-4">
                         <!-- Left Side -->
                         <div class="w-full lg:w-1/2 text-left mob-text-center">
                             <h1 class="text-2xl sm:text-3xl font-semibold">Organizations</h1>
                         </div>
 
                         <!-- Right Side -->
-                        <div class="w-full lg:w-1/2 flex justify-end lg:justify-end items-center mob-text-center">
-                            <a href="#" class="btn-new-one">Register NGO</a>
-                        </div>
+                        
+                            <div class="w-full lg:w-1/2 flex justify-end lg:justify-end items-center mob-text-center">
+                                @if (Auth::user()->account_type != 3)
+                                    <a href="{{ route('ngo.create') }}" class="btn-new-one">Register NGO</a>
+                                @endif
+                            </div>
                     </div>
                 <div style="display: flex;">
                     <div class="card eversubzsearch" style="width: 100%;">
@@ -554,42 +589,201 @@
                     @foreach ($ngoCategories as $category)
                         <div>
                             <div class="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-2.5"
-                                uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 20; repeat: true">
+                                 id="ngo-list-{{ $category->id }}"
+                                 uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 20; repeat: true">
 
-                                {{-- Filter only NGOs where status is 1 --}}
-                                @foreach ($category->ngos->where('status', 1) as $ngo)
+                                @php $ngos = $category->ngos->where('status', 1)->values(); @endphp
+                                @foreach ($ngos->take(4) as $ngo)
                                     <div class="card">
-                                        <a
-                                            href="{{ route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))]) }}">
+                                        <a href="{{ route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))]) }}">
                                             <div class="card-media h-24">
-                                                <img src="{{ asset('storage/' . $ngo->logo_path) }}"
-                                                    alt="{{ $ngo->ngo_name }}">
+                                                <img src="{{ asset('storage/' . $ngo->logo_path) }}" alt="{{ $ngo->ngo_name }}">
                                                 <div class="card-overly"></div>
                                             </div>
                                         </a>
                                         <div class="card-body relative z-10">
-                                            <a
-                                                href="{{ route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))]) }}">
+                                            <a href="{{ route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))]) }}">
                                                 <h4 class="card-title line-clamp-1">{{ $ngo->ngo_name }}</h4>
                                             </a>
                                             <div class="card-text mt-1">
                                                 <div class="flex items-center flex-wrap space-x-1">
-                                                    <a
-                                                        href="{{ route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))]) }}">
-                                                        <span> {{ $ngo->members->count() }} Members
-                                                        </span> </a>
+                                                    <a href="{{ route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))]) }}">
+                                                        <span>{{ $ngo->members->count() }} Members</span>
+                                                    </a>
                                                 </div>
-                                                <div class="line-clamp-1">{{ $ngo->ngo_city }}, {{ $ngo->ngo_state }}
-                                                </div>
+                                                <div class="line-clamp-1">{{ $ngo->ngo_city }}, {{ $ngo->ngo_state }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 @endforeach
+                            </div>
 
+                            {{-- View More Button --}}
+                            @if ($ngos->count() > 4)
+                                <div class="text-center mt-3">
+                                    <button class="view-more-btn load-more-btn bg-primary text-white px-4 py-2 rounded"
+                                            data-category="{{ $category->id }}"
+                                            data-total="{{ $ngos->count() }}"
+                                            data-loaded="4">
+                                        View More
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                <script>
+                document.addEventListener("click", function(e) {
+                    if (e.target.classList.contains("view-more-btn")) {
+                        let button = e.target;
+                        let categoryId = button.dataset.category;
+                        let total = parseInt(button.dataset.total);
+                        let loaded = parseInt(button.dataset.loaded);
+
+                        let container = document.querySelector(`#ngo-list-${categoryId}`);
+
+                        let allNgos = JSON.parse(document.querySelector(`#all-ngos-${categoryId}`).textContent);
+                        let nextBatch = allNgos.slice(loaded, loaded + 4);
+
+                        nextBatch.forEach(ngo => {
+                            container.insertAdjacentHTML('beforeend', `
+                                <div class="card">
+                                    <a href="${ngo.url}">
+                                        <div class="card-media h-24">
+                                            <img src="${ngo.image}" alt="${ngo.name}">
+                                            <div class="card-overly"></div>
+                                        </div>
+                                    </a>
+                                    <div class="card-body relative z-10">
+                                        <a href="${ngo.url}">
+                                            <h4 class="card-title line-clamp-1">${ngo.name}</h4>
+                                        </a>
+                                        <div class="card-text mt-1">
+                                            <div class="flex items-center flex-wrap space-x-1">
+                                                <a href="${ngo.url}">
+                                                    <span>${ngo.members} Members</span>
+                                                </a>
+                                            </div>
+                                            <div class="line-clamp-1">${ngo.city}, ${ngo.state}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                        });
+
+                        loaded += nextBatch.length;
+                        button.dataset.loaded = loaded;
+
+                        if (loaded >= total) {
+                            button.remove();
+                        }
+                    }
+                });
+                </script>
+
+                @foreach ($ngoCategories as $category)
+                    @php
+                        $ngos = $category->ngos->where('status', 1)->values();
+                        $jsonData = $ngos->map(fn($ngo) => [
+                            'id' => $ngo->id,
+                            'name' => e($ngo->ngo_name),
+                            'city' => e($ngo->ngo_city ?? '-'),
+                            'state' => e($ngo->ngo_state ?? '-'),
+                            'members' => $ngo->members->count(),
+                            'image' => asset('storage/' . $ngo->logo_path),
+                            'url' => route('ngo.show', ['id' => urlencode(Crypt::encryptString($ngo->id))])
+                        ]);
+                    @endphp
+                    <script type="application/json" id="all-ngos-{{ $category->id }}">
+                        {!! $jsonData->toJson() !!}
+                    </script>
+                @endforeach
+
+                <div class="sm:my-6 my-3 flex items-center justify-between hidesearchresult">
+                    <div>
+                        <h2 class="md:text-lg text-base font-semibold text-black"> Ads Packages </h2>
+                    </div>
+                </div>
+                <div id="donation-container" class="flex flex-wrap -mx-3">
+                    @foreach($donationPackages as $index => $donationPackage)
+                        <div class="donation-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-3 mb-6" 
+                             style="{{ $index >= 4 ? 'display:none;' : '' }}">
+                            <div class="card bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition duration-300">
+                                <a href="{{ route('ngo.donationpackege', ['id' => urlencode(Crypt::encryptString($donationPackage->id))]) }}">
+                                    <div class="card-media h-40 overflow-hidden relative">
+                                        <img src="{{ asset('storage/' . $donationPackage->image) }}" 
+                                             alt="{{ $donationPackage->name }}" 
+                                             class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-20 transition"></div>
+                                    </div>
+                                </a>
+                                <div class="card-body p-4">
+                                    <a href="{{ route('ngo.donationpackege', ['id' => urlencode(Crypt::encryptString($donationPackage->id))]) }}">
+                                        <h4 class="card-title text-lg font-semibold text-gray-800">
+                                            {{ Str::limit($donationPackage->name, 30, '...') }}
+                                        </h4>
+                                    </a>
+                                    <div class="card-text mt-2">
+                                        <p class="text-gray-600">
+                                            Price - <span class="text-blue-600 font-semibold">
+                                                ${{ number_format($donationPackage->price, 2) }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
+
+                @if($donationPackages->count() > 4)
+                    <div class="text-center mt-6">
+                        <button id="viewMoreBtnPackage" class="px-5 load-more-btn py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
+                            View More
+                        </button>
+                    </div>
+                @endif
+
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        let itemsToShow = 4;
+                        let donationCards = document.querySelectorAll(".donation-card");
+                        let viewMoreBtn = document.getElementById("viewMoreBtnPackage");
+                        let currentlyVisible = 4;
+
+                        document.addEventListener("click", function (e) {
+                            if (e.target && e.target.id === "viewMoreBtnPackage") {
+                                for (let i = currentlyVisible; i < currentlyVisible + itemsToShow && i < donationCards.length; i++) {
+                                    donationCards[i].style.display = "block";
+                                    donationCards[i].classList.add("fade-in");
+                                }
+
+                                currentlyVisible += itemsToShow;
+
+                                if (currentlyVisible >= donationCards.length) {
+                                    viewMoreBtn.style.display = "none";
+                                }
+                            }
+                        });
+                    });
+                    </script>
+
+                    <style>
+                    /* Optional: fade-in effect for smoother appearance */
+                    .fade-in {
+                        animation: fadeIn 0.4s ease-in;
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(5px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    </style>
+
+
+
+
 
 
                 <div class="sm:my-6 my-3 flex items-center justify-between lg:mt-10 hidesearchresult">
@@ -598,31 +792,75 @@
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 md:gap-2 gap-3 hidesearchresult" id="donorList">
-                    @foreach ($fundraisings as $fundraising)
-                        <div class="flex md:items-center space-x-4 p-4 rounded-md box">
-                            <div class="sm:w-20 w-14 sm:h-20 h-14 flex-shrink-0 rounded-lg relative">
-                                <img loading="eager" src="{{ asset('storage/' . $fundraising->main_image) }}"
-                                     class="absolute w-full h-full inset-0 rounded-md object-cover shadow-sm"
-                                     alt="fundraising image">
-                            </div>
-                            <div class="flex-1">
-                                <a href="{{ route('fundaraising.show', $fundraising->slug) }}"
-                                   class="md:text-lg text-base font-semibold capitalize text-black">
-                                    {{ $fundraising->title }}
-                                </a>
-                                <div class="items-center text-sm font-normal">
-                                    <div>For - {{ $fundraising->for }}</div>
-                                    <div>Category - {{ $fundraising->category->name ?? '-' }}</div>
-                                </div>
-                            </div>
-                            <a href="{{ route('fundaraising.show', $fundraising->slug) }}"
-                               class="button bg-primary-soft text-primary gap-1 max-md:hidden">
-                                <ion-icon name="add-circle" class="text-xl -ml-1"></ion-icon> View
-                            </a>
-                        </div>
-                    @endforeach
+                <div id="donorList" class="grid md:grid-cols-2 md:gap-2 gap-3 hidesearchresult">
+    @foreach ($fundraisings as $fundraising)
+        <div class="flex md:items-center space-x-4 p-4 rounded-md box">
+            <div class="sm:w-20 w-14 sm:h-20 h-14 flex-shrink-0 rounded-lg relative">
+                <img loading="eager" src="{{ asset('storage/' . $fundraising->main_image) }}"
+                     class="absolute w-full h-full inset-0 rounded-md object-cover shadow-sm"
+                     alt="fundraising image">
+            </div>
+            <div class="flex-1">
+                <a href="{{ route('fundaraising.show', $fundraising->slug) }}"
+                   class="md:text-lg text-base font-semibold capitalize text-black">
+                    {{ $fundraising->title }}
+                </a>
+                <div class="items-center text-sm font-normal">
+                    <div>For - {{ $fundraising->for }}</div>
+                    <div>Category - {{ $fundraising->category->name ?? '-' }}</div>
                 </div>
+            </div>
+            <a href="{{ route('fundaraising.show', $fundraising->slug) }}"
+               class="button bg-primary-soft text-primary gap-1 max-md:hidden">
+                <ion-icon name="add-circle" class="text-xl -ml-1"></ion-icon> View
+            </a>
+        </div>
+    @endforeach
+</div>
+
+@if ($fundraisings->hasMorePages())
+    <div class="text-center mt-4">
+        <button id="loadMore"
+            class="load-more-btn"
+            data-next-page="2"
+            data-url="{{ route('ngo.list') }}">
+           <span> Show More</span>
+        </button>
+    </div>
+@endif
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loadMoreBtn = document.getElementById("loadMore");
+    const donorList = document.getElementById("donorList");
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", function () {
+            const nextPage = this.getAttribute("data-next-page");
+            const url = this.getAttribute("data-url") + "?page=" + nextPage;
+
+            this.innerText = "Loading...";
+            this.disabled = true;
+
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(res => res.json())
+                .then(data => {
+                    donorList.insertAdjacentHTML("beforeend", data.html);
+                    this.innerText = "Show More";
+                    this.disabled = false;
+
+                    if (data.hasMore) {
+                        this.setAttribute("data-next-page", data.nextPage);
+                    } else {
+                        this.style.display = "none";
+                    }
+                })
+                .catch(err => console.error(err));
+        });
+    }
+});
+</script>
+
 
 
                 <div id="showingsearchresult"></div>
@@ -646,63 +884,8 @@
             @endif
         @else
             <!-- Signup Form for Non-Authenticated or Unverified Users -->
-            <div class="row justify-content-center hidesearchresult">
-                <div class="col-md-6 mob-pad-0">
-                    <form action="{{ route('register') }}" method="POST" id="signup-form">
-                        <h5 class="mb-4 mob-center text-center">Please log in to view Sabz Future listings and details.</h5>
-                        @csrf
-                        <div class="row mb-3">
-                            <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                <input type="text" class="form-control custom-input" placeholder="Name" name="name"
-                                    required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <input type="text" class="form-control custom-input" placeholder="Username" name="username"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <input type="email" class="form-control custom-input" placeholder="Business email" name="email"
-                                required>
-                        </div>
-                        <div class="mb-3 position-relative">
-                            <input type="password" class="form-control custom-input" placeholder="Password" id="password"
-                                name="password" required>
-                            <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor: pointer;"
-                                onclick="togglePassword('password')">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                        </div>
-                        <div class="mb-3 position-relative">
-                            <input type="password" class="form-control custom-input" placeholder="Confirm Password"
-                                id="password_confirmation" name="password_confirmation" required>
-                            <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor: pointer;"
-                                onclick="togglePassword('password_confirmation')">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                        </div>
+            <x-register-form title-text="Please log in to view Sabz Future listings and details." />
 
-                        <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="signup_check" name="signup_check" required>
-                        <label class="form-check-label small" for="signup_check">
-                            By creating this account you accept our 
-                            <a href="{{ asset('terms-of-use') }}">Terms of Use</a> 
-                            and <a href="{{ asset('privacy-policy') }}">Privacy Policy</a>
-                        </label>
-                    </div>
-                        <input type="hidden" name="account_type" value="4">
-                        <div class="mb-3">
-                            <div id="signup-error" class="text-danger" style="display: none;"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 register-btn">
-                            Register Now
-                            <span class="spinner-border spinner-border-sm" style="display: none;"></span>
-                        </button>
-                        <p class="text-center mt-3 small">Already have a Account? <a href="{{ route('user.login') }}">Log in</a>
-                        </p>
-                    </form>
-                </div>
-            </div>
         @endif
     {{-- end new code --}}
     
@@ -724,41 +907,11 @@
                         e.preventDefault();
                         const encryptedNgoId = button.getAttribute('data-ngo-id');
                         const form = document.getElementById(`join-form-${encryptedNgoId}`);
-                        console.log(encryptedNgoId); console.log(form);
                         if (confirm('Are you sure you want to join this NGO?')) {
                             form.submit();
                         }
                     });
                 });
-            });
-
-
-            document.addEventListener("DOMContentLoaded", function () {
-                let loadMoreBtn = document.getElementById("loadMore");
-                let donorList   = document.getElementById("donorList");
-
-                if (loadMoreBtn) {
-                    loadMoreBtn.addEventListener("click", function () {
-                        let nextPage = this.getAttribute("data-next-page");
-                        let url      = this.getAttribute("data-url") + "?page=" + nextPage;
-
-                        this.innerText = "Loading...";
-
-                        fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-                            .then(res => res.json())
-                            .then(data => {
-                                donorList.insertAdjacentHTML("beforeend", data.html);
-                                this.innerText = "Show More";
-
-                                if (data.hasMore) {
-                                    this.setAttribute("data-next-page", data.nextPage);
-                                } else {
-                                    this.style.display = "none";
-                                }
-                            })
-                            .catch(err => console.error(err));
-                    });
-                }
             });
 
 
@@ -768,12 +921,14 @@
                 $('#signup-form').on('submit', function(e) {
                     e.preventDefault();
 
-                    const $button = $('#signup-btn');
-                    const $loader = $button.find('.spinner-border');
+                    const $button = $('.register-btn'); 
+                    const $spinner = $button.find('.spinner-border');
+                    const $btnText = $button.find('.btn-text');
                     const $errorDiv = $('#signup-error');
 
                     $button.prop('disabled', true);
-                    $loader.show();
+                    $spinner.css('display', 'inline-block');
+                    $btnText.hide();
                     $errorDiv.hide();
 
                     const formData = $(this).serialize();
@@ -784,15 +939,15 @@
                         data: formData,
                         success: function(response) {
                             if (response.success) {
-                                $errorDiv.removeClass('text-danger').addClass('text-success').text(
-                                    response.message).show();
+                                $errorDiv.removeClass('text-danger').addClass('text-success').text(response.message).show();
                                 setTimeout(() => {
                                     window.location.href = response.redirect;
                                 }, 1000);
                             } else {
-                                $errorDiv.text(response.message).show();
+                                $errorDiv.removeClass('text-success').addClass('text-danger').text(response.message).show();
                                 $button.prop('disabled', false);
-                                $loader.hide();
+                                $spinner.hide();
+                                $btnText.show();
                             }
                         },
                         error: function(xhr) {
@@ -803,12 +958,14 @@
                             } else if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
                             }
-                            $errorDiv.text(errorMessage).show();
+                            $errorDiv.removeClass('text-success').addClass('text-danger').text(errorMessage).show();
                             $button.prop('disabled', false);
-                            $loader.hide();
+                            $spinner.hide();
+                            $btnText.show();
                         }
                     });
                 });
+
 
                 function togglePassword(fieldId) {
                     const passwordField = $('#' + fieldId);

@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\Event; 
 use App\Models\StoreOrder;
 use App\Models\StoreOrderItem;
+use Barryvdh\DomPDF\Facade\Pdf;
  
 
 
@@ -67,16 +68,51 @@ class OrderController extends Controller
     
             // Show the status directly as text 
             $status = ucfirst($order->status); // Capitalize the first letter for display
+
+            if ($status == 'Pending') {
+                $statusHtml = '<span class="status-badge bg-warning-faint text-warning-dark">
+                                  <span class="status-dot bg-warning-dark"></span> Pending
+                               </span>';
+            } elseif ($status == 'Completed') {
+                $statusHtml = '<span class="status-badge bg-success-faint text-success-dark">
+                                  <span class="status-dot bg-success-dark"></span> Completed
+                               </span>';
+            } elseif ($status == 'Failed') {
+                $statusHtml = '<span class="status-badge bg-danger-faint text-danger-dark">
+                                  <span class="status-dot bg-danger-dark"></span> Failed
+                               </span>';
+            } else {
+                $statusHtml = '<span class="status-badge bg-secondary-faint text-secondary-dark">
+                                  <span class="status-dot bg-secondary-dark"></span>' . ucfirst($status) . '
+                               </span>';
+            }
+
+            $eventTitle = $order->event->title ?? 'N/A';
+
+            if ($eventTitle === 'EverSabz Launch in Australia') {
+                $eventHtml = '<span class="status-badge bg-primary-faint text-primary-dark">
+                                 <span class="status-dot bg-primary-dark"></span>' . htmlspecialchars($eventTitle) . '
+                              </span>';
+            } else {
+                $eventHtml = '<span class="status-badge bg-secondary-faint text-secondary-dark">
+                                 <span class="status-dot bg-secondary-dark"></span>' . htmlspecialchars($eventTitle) . '
+                              </span>';
+            }
+
+
+
     
             // Populate the data row, ensuring the order matches the table headers
             $result['data'][] = [
-                $order->order_event_unique_id,                             // Order ID
-                $order->event->title ?? 'N/A',          // Event
+                $order->order_event_unique_id ?? '-',                             // Order ID
+                $eventHtml,          // Event
                 $order->first_name || $order->last_name
-    ? trim(($order->first_name ?? '') . ' ' . ($order->last_name ?? ''))
-    : 'N/A',
-                $order->email ?? $order->guest_email,                  // Order For
-                $status,                                // Status
+                ? trim(($order->first_name ?? '') . ' ' . ($order->last_name ?? ''))
+                : '-',
+                (($order->email ?? '-') ?? ($order->guest_email ?? '-')) ?? '-',                  // Order For
+                $statusHtml,                                // Status
+                optional($order->created_at)->format('d-m-Y'),
+                optional($order->updated_at)->format('d-m-Y'),
                 $buttons                                // Action
             ]; 
         }
@@ -131,7 +167,7 @@ class OrderController extends Controller
 
         $storeOrdersQuery = StoreOrder::whereHas('items')
             ->with(['items.product','business','user'])
-            ->orderBy('id', 'desc');
+            ->orderBy('created_at', 'desc');
         if ($request->has('search') && $request->input('search')['value']) {
             $search = $request->input('search')['value'];
             $storeOrdersQuery->where(function ($query) use ($search) {
@@ -147,6 +183,19 @@ class OrderController extends Controller
         foreach ($storeOrders as $storeOrder) {
             
             $buttons  = '<a href="' . route('orderitem.view', ['id' => $storeOrder->id]) . '" class="btn btn-default btn-sm icon-btn"><i class="fa fa-eye"></i></a>';
+            
+            $buttons .= '<a href="' . route('orderitem.print', ['id' => $storeOrder->id]) . '" 
+                class="btn btn-default btn-sm icon-btn" 
+                title="Print Invoice" 
+                target="_blank">
+                <i class="fa fa-print"></i>
+             </a>';
+
+            $buttons .= '<a href="' . route('orderitem.download.pdf', ['id' => $storeOrder->id]) . '" 
+                            class="btn btn-default btn-sm icon-btn" 
+                            title="Download PDF">
+                            <i class="fa fa-file-pdf-o" style="color:red;"></i>
+                         </a>';
             $buttons .= '<button type="button" class="btn btn-default btn-sm icon-btn" onclick="removeFunc(\'' . $storeOrder->id . '\')" data-bs-toggle="modal" data-bs-target="#removeModal"><i class="fa fa-trash"></i></button>';
 
             $itemDetails = $storeOrder->items->map(function ($item) {
@@ -154,20 +203,66 @@ class OrderController extends Controller
 
             })->implode(', ');
 
+
+            $status = strtolower($storeOrder->payment_status);
+
+            if ($status === 'success') {
+                $statusHtml = '<span class="status-badge status-success"><span class="status-dot"></span>' . ucfirst($status) . '</span>';
+            } elseif ($status === 'failed') {
+                $statusHtml = '<span class="status-badge status-failed"><span class="status-dot"></span>' . ucfirst($status) . '</span>';
+            } elseif ($status === 'pending') {
+                $statusHtml = '<span class="status-badge status-pending"><span class="status-dot"></span>' . ucfirst($status) . '</span>';
+            } else {
+                $statusHtml = '<span class="status-badge"><span class="status-dot"></span>' . ucfirst($status) . '</span>';
+            }
+
+            $itemStatus = strtolower($storeOrder->items->first()->status);
+
+            if ($itemStatus === 'pending') {
+                $itemStatusHtml = '<span class="item-status-badge item-status-pending"><span class="item-status-dot"></span>' . ucfirst($itemStatus) . '</span>';
+            } elseif ($itemStatus === 'success') {
+                $itemStatusHtml = '<span class="item-status-badge item-status-success"><span class="item-status-dot"></span>' . ucfirst($itemStatus) . '</span>';
+            } elseif ($itemStatus === 'failed') {
+                $itemStatusHtml = '<span class="item-status-badge item-status-failed"><span class="item-status-dot"></span>' . ucfirst($itemStatus) . '</span>';
+            } else {
+                $itemStatusHtml = '<span class="item-status-badge"><span class="item-status-dot"></span>' . ucfirst($itemStatus) . '</span>';
+            }
+
+            $shippingMethod = $storeOrder->shipping_method ?? '-';
+
+            if (strtolower($shippingMethod) === 'eversabz') {
+                $shippingHtml = '<span class="shipping-badge shipping-eversabz"><span class="shipping-dot"></span>' . ucfirst($shippingMethod) . '</span>';
+            } else {
+                $shippingHtml = '<span class="shipping-badge shipping-default"><span class="shipping-dot"></span>' . ucfirst($shippingMethod) . '</span>';
+            }
+
+            $businessName = $storeOrder?->business?->business_name ?? '-';
+
+            if ($businessName === 'Everstore Australia') {
+                $businessHtml = '<span class="business-badge business-everstore">
+                                    <span class="business-dot"></span>' . htmlspecialchars($businessName) . '
+                                 </span>';
+            } else {
+                $businessHtml = '<span class="business-badge business-default">
+                                    <span class="business-dot"></span>' . htmlspecialchars($businessName) . '
+                                 </span>';
+            }
+
+
             // ✅ Product count
                 $productCount = $storeOrder->items->count();
             
             $result['data'][] = [
                 $storeOrder->order_product_unique_id,
                 $storeOrder->created_at->format('d-m-Y H:i'),
-                // $storeOrder->user->uid,
                 $productCount,
                 $storeOrder->full_name ?? 'Guest User',
-                // $storeOrder->email ?? $storeOrder->guest_email,
-                $storeOrder?->business?->business_name ?? '-',
-                ucfirst($storeOrder->payment_status),
-                ucfirst($storeOrder->items->first()->status),
-                $storeOrder->shipping_method ?? '-',
+                $businessHtml,
+                $statusHtml,
+                $itemStatusHtml,
+                $shippingHtml,
+                optional($storeOrder->created_at)->format('d-m-Y'),
+                optional($storeOrder->updated_at)->format('d-m-Y'),
                 $buttons
             ];
         }
@@ -233,5 +328,41 @@ class OrderController extends Controller
         }
     }
 
-   
+    public function printInvoice($id)
+    {
+        $order = StoreOrder::with(['items.product'])->findOrFail($id);
+        return view('admin.order.invoice', compact('order'));
+    }
+
+    public function downloadPDF($id)
+    {
+        $order = StoreOrder::with(['items.product'])->findOrFail($id);
+
+        // Generate PDF
+        $pdf = Pdf::setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ])->loadView('admin.order.invoice', compact('order'))
+          ->setPaper('a4', 'portrait');
+
+        // Create file name and path
+        $uniqueFileName = 'Order_' . $order->order_product_unique_id . '.pdf';
+        $relativePath = 'public/' . $uniqueFileName;
+        $fullPath = Storage::path($relativePath);
+
+        // Save PDF to storage
+        $pdf->save($fullPath);
+
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            return response()->json(['error' => 'PDF not found.'], 404);
+        }
+
+        // ✅ Force browser to download instead of view inline
+        return response()->download($fullPath, $uniqueFileName, [
+            'Content-Type' => 'application/pdf',
+        ])->deleteFileAfterSend(false); // Set true if you want to auto-delete after download
+    }
+
+
 }

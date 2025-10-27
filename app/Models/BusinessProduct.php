@@ -32,6 +32,7 @@ class BusinessProduct extends Model
         'feature',
         'orderby',
         'max_qty',
+        'is_active',
     ];
    
 

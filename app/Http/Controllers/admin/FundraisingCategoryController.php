@@ -32,7 +32,7 @@ class FundraisingCategoryController extends Controller
     public function fetchTableData(){
         $result = ['data' => []];
 
-        $categories = FundraisingCategory::select('id', 'name', 'slug','status')->orderby('id','desc')->get();
+        $categories = FundraisingCategory::select('id', 'name', 'slug','status','created_at','updated_at')->orderby('id','desc')->get();
 
         foreach ($categories as $key => $category) {
             $buttons = ''; $status  ='';
@@ -55,6 +55,8 @@ class FundraisingCategoryController extends Controller
                 $category->name,
                 $category->slug,
                 $status,
+                optional($category->created_at)->format('d-m-Y'),
+                optional($category->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

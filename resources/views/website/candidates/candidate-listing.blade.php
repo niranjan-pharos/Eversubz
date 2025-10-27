@@ -583,7 +583,7 @@
       @endif
       @else
          <!-- Signup Form for Non-Authenticated or Unverified Users -->
-         <div class="row justify-content-center">
+         <!-- <div class="row justify-content-center">
             <div class="col-md-6 mob-pad-0">
             <form action="{{ route('register') }}" method="POST" id="signup-form">
                <h5 class="mb-4 mob-center text-center">Please log in to view candidate listings and details.</h5>
@@ -629,7 +629,8 @@
                 <p class="text-center mt-3 small">Already have a Account? <a href="{{ route('user.login') }}">Log in</a></p>
             </form>
             </div>
-         </div>
+         </div> -->
+         <x-register-form title-text="Please log in to view candidate listings and details." />
          @endif
          {{-- end new code --}}
       </div>

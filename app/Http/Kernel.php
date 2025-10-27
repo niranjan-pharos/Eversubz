@@ -56,6 +56,9 @@ class Kernel extends HttpKernel
         'no.cache' => \App\Http\Middleware\PreventCacheForCertainRoutes::class,
         'account.type' => \App\Http\Middleware\AccountTypeMiddleware::class,
         'admin.approved' => \App\Http\Middleware\CheckAdminApproval::class,
+        'signed.lenient' => \App\Http\Middleware\ValidateSignatureLenient::class,
+        'signed.flex' => \App\Http\Middleware\ValidateSignatureFlexible::class,
+        'probe' => \App\Http\Middleware\LogSignatureProbe::class
     ];
 
     

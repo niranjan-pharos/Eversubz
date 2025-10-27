@@ -148,6 +148,10 @@
       color: #000
     }
 
+    .sidebar-menu li a{
+      justify-content: left;
+    }
+
     .dropdown-menu.show li i {
       background: 0 0;
       font-size: 15px;
@@ -1110,8 +1114,14 @@
           </svg><span>Menu</span>
         </button>
 
-
-
+        <button type="button" class="mobile-widget back-btn" onclick="window.history.back()">
+          <svg class="w-5 h-5 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 18l-6-6 6-6" />
+          </svg>
+          <span>Back</span>
+        </button>
       </div>
     </div>
   </nav>

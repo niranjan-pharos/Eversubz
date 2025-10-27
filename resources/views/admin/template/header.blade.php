@@ -49,6 +49,10 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.full.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 	
 
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -156,11 +160,12 @@
 
 			/* Style DataTable header */
 			table.dataTable thead th {
-			    background-color: #e9ecef !important;  /* light grey */
+			    background-color: #fff !important;  /* light grey */
 			    font-weight: bold;
 			    color: #333;  /* dark text */
 			    padding: 8px; /* adjust spacing */
 			    text-align: center; /* optional: center text */
+			    border-top: none;
 			}
 
 			/* Show & style ASC icon */
@@ -419,6 +424,24 @@
 								      <li class="{{ setActive(['events.*'])}}"><a href="{{ route('eventTicketCategory.index') }}">Category List</a></li>
 								</ul>
 							</li>
+							<li class="submenu {{ setActive([
+								'donationa_packages.*'
+								])}}">
+							    <a href="#">
+							        <i class="fa fa-credit-card"></i>
+							        <span> Donation Packages</span>
+							        <span class="menu-arrow"></span>
+							    </a>
+							    <ul style="display: none;">
+							        <li class="{{ setActive(['adminDonationPackages']) }}">
+							            <a href="{{ route('adminDonationPackages') }}">Donation Packages</a>
+							        </li>
+							        <li class="{{ setActive(['adminDonationPackagesListing']) }}">
+							            <a href="{{ route('adminDonationPackagesListing') }}">Donation List</a>
+							        </li>
+							    </ul>
+							</li>
+
 							<li class="submenu {{ setActive([
 								'business.*'
 								])}} ">

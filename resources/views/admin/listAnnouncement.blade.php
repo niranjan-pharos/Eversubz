@@ -20,6 +20,8 @@
                                                 <th>description</th>
                                                 <th>Order by</th>
                                                 <th>Status</th>
+                                                <th>Created Date</th>
+                                                <th>Updated Date</th>
                                                 <th class="text-right">Action</th>
                                             </tr>
                                         </thead>
@@ -103,8 +105,6 @@
             'order': []
         });
 
- 
-        // change status 
         $('body').on('click','.change-status',function(){
             let isCHecked = $(this).is(':checked');
             let id= $(this).data('id');
@@ -125,9 +125,6 @@
     });
 
      
-
-
-    // remove functions
     function removeFunc(id) {
         if (confirm("You won't get back your event. Are you sure you want to delete?")) {
             $.ajax({
@@ -139,7 +136,6 @@
                 success: function (response) {
                     if (response.success) {
                         toastr.success(response.message);
-                        // Refresh the table or remove the deleted event row
                         location.reload();
                     } else if (response.error) {
                         toastr.error(response.error);

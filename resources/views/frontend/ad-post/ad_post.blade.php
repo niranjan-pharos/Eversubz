@@ -263,7 +263,190 @@ gap: 12px; }} .image-container { display: flex;flex-direction: column; align-ite
                             </div>
                         </div>
                     </div>
-                    
+
+                    <div class="variants-card d-none">
+                        <div class="adpost-title">
+                            <h4>Variants</h4>
+                        </div>
+                        <div class="info-box">
+                            Add variants if this product comes in multiple versions, like different sizes or colors.
+                        </div>
+
+                        <div class="variant-inputs" id="variant-inputs">
+                            <!-- Pre-added Size and Color -->
+                            <div class="variant-row">
+                                <input type="text" name="option_name[]" value="Size">
+                                <input type="text" name="option_value[]" class="variant-input" placeholder="e.g., S, M, L, XL">
+                                <button type="button" class="remove-variant">×</button>
+                            </div>
+                            <div class="variant-row">
+                                <input type="text" name="option_name[]" value="Color">
+                                <input type="text" name="option_value[]" class="variant-input" placeholder="e.g., Red, Black, Blue">
+                                <button type="button" class="remove-variant">×</button>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-variant-btn" style="background:#28a745;color:#fff;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;margin-bottom:10px;">
+                            <i class="fa fa-plus-square" aria-hidden="true"></i> Add Variant Type
+                        </button>
+                        <p>Modify the variants to be created:</p>
+
+                        <table class="variant-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Variant</th>
+                                    <th>SKU</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="variant-table-body"></tbody>
+                        </table>
+                    </div>
+
+
+                    <style>
+                    .variants-card { background: #fff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px; font-family: Arial, sans-serif; margin-bottom:30px; }
+                    .variants-card h4 { margin-bottom: 10px; }
+                    .info-box { background: #dff0d8; color: #3c763d; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; }
+                    .variant-inputs { margin-bottom: 15px; }
+                    .variant-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+                    .variant-row input[type="text"] { flex: 1; padding: 6px 8px; border: 1px solid #d3d3d3; border-radius: 4px; }
+                    .variant-row input[readonly] { background:#f0f0f0; }
+                    .remove-variant { background:#5e5a5a;color:#fff;border:none;padding:0 10px;border-radius:4px;cursor:pointer; }
+                    .variant-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top:10px; }
+                    .variant-table th, 
+                    .variant-table td {
+                        border: none;               /* remove all borders first */
+                        border-bottom: 1px solid #d3d3d3; /* only bottom border */
+                        padding: 6px 10px;
+                        text-align: center;
+                    }
+                    .variant-table th { background: #f7f7f7; }
+                    .variant-table input[type="number"] { width: 70px; padding: 4px 6px; border: 1px solid #d3d3d3; border-radius: 4px; text-align: right; }
+                    .btn-upload { background: #007bff; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+                    .btn-upload:hover { background: #0066ff; }
+                    .variant-table td { vertical-align: middle; }
+                    .eye-icon { cursor: pointer; margin-left: 5px; color: #007bff; }
+
+                    /* 📱 Responsive Styles */
+                    @media (max-width: 768px) {
+                        .variant-row {
+                            flex-direction: column; /* stack inputs vertically */
+                            align-items: stretch;
+                        }
+                        .variant-row input[type="text"] {
+                            width: 100%;
+                        }
+                        .remove-variant {
+                            align-self: flex-end;
+                            margin-top: 5px;
+                        }
+                        .variant-table {
+                            display: block;
+                            overflow-x: auto; /* scroll horizontally if needed */
+                            white-space: nowrap;
+                        }
+                        .variant-table th,
+                        .variant-table td {
+                            font-size: 12px;
+                            padding: 5px;
+                        }
+                        .btn-upload {
+                            width: 100%;
+                            text-align: center;
+                            margin-top: 8px;
+                        }
+                    }
+
+                    @media (max-width: 480px) {
+                        .variants-card {
+                            padding: 10px;
+                        }
+                        .info-box {
+                            font-size: 12px;
+                            padding: 6px 10px;
+                        }
+                        .variant-table input[type="number"] {
+                            width: 50px;
+                        }
+                    }
+
+
+                    </style>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                        const variantInputsContainer = document.getElementById('variant-inputs');
+                        const addVariantBtn = document.getElementById('add-variant-btn');
+                        const tableBody = document.getElementById('variant-table-body');
+                        let skuCounter = 1;
+
+                        function updateTable() {
+                            tableBody.innerHTML = '';
+                            const variantRows = document.querySelectorAll('.variant-row');
+                            let hasRecords = false;
+
+                            variantRows.forEach(row => {
+                                const nameInput = row.querySelector('input[name="option_name[]"]');
+                                const valueInput = row.querySelector('input[name="option_value[]"]');
+
+                                const name = nameInput.value.trim();
+                                const values = valueInput.value.split(',').map(v => v.trim()).filter(Boolean);
+
+                                if(name && values.length > 0) {
+                                    hasRecords = true;
+                                    values.forEach(val => {
+                                        const tr = document.createElement('tr');
+                                        tr.innerHTML = `
+                                            <td><input type="checkbox" checked></td>
+                                            <td><span style="color:#0066ff">${val}</span> • ${name}</td>
+                                            <td>#SKU${skuCounter.toString().padStart(6,'0')}</td>
+                                            <td><input type="number" value="0.00"></td>
+                                            <td><input type="number" value="0"></td>
+                                            <td><button type="button" class="btn-upload"><i class="fa fa-upload" aria-hidden="true"></i> Upload Image</button></td>
+                                        `;
+                                        tableBody.appendChild(tr);
+                                        skuCounter++;
+                                    });
+                                }
+                            });
+
+                            if(!hasRecords) {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `<td colspan="6" style="text-align:center; color:#888;">Record not found</td>`;
+                                tableBody.appendChild(tr);
+                            }
+                        }
+
+                        variantInputsContainer.addEventListener('input', function(e) {
+                            if(e.target.classList.contains('variant-input')) updateTable();
+                        });
+
+                        addVariantBtn.addEventListener('click', function() {
+                            const newRow = document.createElement('div');
+                            newRow.classList.add('variant-row');
+                            newRow.innerHTML = `
+                                <input type="text" name="option_name[]" placeholder="Option name (e.g., Material)">
+                                <input type="text" name="option_value[]" class="variant-input" placeholder="Option values separated by commas">
+                                <button type="button" class="remove-variant">×</button>
+                            `;
+                            variantInputsContainer.appendChild(newRow);
+                        });
+
+                        variantInputsContainer.addEventListener('click', function(e) {
+                            if(e.target.classList.contains('remove-variant')) {
+                                e.target.closest('.variant-row').remove();
+                                updateTable();
+                            }
+                        });
+
+                        updateTable();
+                    });
+                    </script>
+
 
                     <div class="adpost-card pb-2">
                         <div class="adpost-agree">

@@ -44,7 +44,7 @@ class JobsController extends Controller
     {
         $result = ['data' => []];
     
-        $jobs = Job::select('id', 'title', 'slug', 'company_name', 'address', 'category_id', 'city','status')
+        $jobs = Job::select('id', 'title', 'slug', 'company_name', 'address', 'category_id', 'city','status','created_at','updated_at')
             ->with(['category:id,name'])
             ->orderBy('id', 'desc')
             ->get();
@@ -53,7 +53,7 @@ class JobsController extends Controller
             $buttons = '';
     
             $buttons .= '<a href="' . route('jobs.show', $job->slug) . '" class="btn btn-default btn-sm icon-btn"><i class="fa fa-eye"></i></a>';
-            $buttons .= '<a class="dropdown-item" href="' . route('JobEdit', ['id' => $job->id]) . '" ><i class="fa fa-pencil m-r-5"></i> Edit Job</a>';
+            $buttons .= '<a class="dropdown-item" href="' . route('JobEdit', ['id' => $job->id]) . '" ><i class="fa fa-pencil m-r-5"></i></a>';
             $buttons .= '<button type="button" class="btn btn-default btn-sm icon-btn" data-bs-toggle="modal" data-bs-target="#removeModal" onclick="removeFunc(\'' . $job->slug . '\')"><i class="fa fa-trash"></i></button>';
     
             $status = $job->status === 'active'
@@ -72,6 +72,8 @@ class JobsController extends Controller
                 $location,
                 $job->category ? $job->category->name : '',
                 $status,
+                optional($job->created_at)->format('d-m-Y'),
+                optional($job->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

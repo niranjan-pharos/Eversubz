@@ -16,6 +16,7 @@ use App\Models\UserBusinessHour;
 use App\Models\Enquiry;
 use App\Models\BusinessImage;
 use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use Intervention\Image\Facades\Image;
 
 use Illuminate\Support\Facades\Validator;
@@ -60,7 +61,7 @@ class BusinessController extends Controller
     {
         $result = ['data' => []];
 
-        $posts = User::select('users.id','users.uid', 'users.name', 'users.email', 'users.is_admin_approved')
+        $posts = User::select('users.id','users.uid', 'users.name', 'users.email', 'users.is_admin_approved','users.created_at','users.updated_at')
             ->where('account_type', 2)
             ->with(['businessInfos:id,business_name,user_id,status,feature'])
             ->orderBy('id', 'desc')
@@ -97,7 +98,9 @@ class BusinessController extends Controller
                 $post->email,
                 $post->businessInfos->business_name ?? '-',
                 $status,
-                $feature
+                $feature,
+                optional($post->created_at)->format('d-m-Y'),
+                optional($post->updated_at)->format('d-m-Y')
             ];
         }
        
@@ -198,7 +201,7 @@ class BusinessController extends Controller
         $id = $request->id;
     
         // Fetch data and force encoding to UTF-8
-        $posts = BusinessProduct::select('id', 'title', 'product_id','category_id', 'price', 'mrp', 'description', 'main_image', 'video_url', 'status', 'feature')
+        $posts = BusinessProduct::select('id', 'title', 'product_id','category_id', 'price', 'mrp', 'description', 'main_image', 'video_url', 'status', 'feature','created_at','updated_at')
             ->with(['Category' => function($query) {
                 $query->select('id', 'name'); 
             }])
@@ -373,6 +376,7 @@ class BusinessController extends Controller
         
 
         $productInfo = BusinessProduct::findOrFail($product_id);
+        $productVariantInfo = ProductVariant::where('product_id', $product_id)->get();
         // dd($productInfo);
         if (!$productInfo) {
             return redirect()->back()->with('error', 'Product not found.');
@@ -388,7 +392,7 @@ class BusinessController extends Controller
             ['label' => "Edit Product - $product_title", 'url' => null]
         ];
         $languages = $productInfo->languages; 
-        return view('admin.business.edit_product', compact('breadcrumbs','productInfo', 'categories', 'subcategories', 'bid'));
+        return view('admin.business.edit_product', compact('breadcrumbs','productInfo', 'categories', 'subcategories', 'bid','productVariantInfo'));
     }
 
     public function updateProduct(Request $request)
@@ -482,6 +486,53 @@ class BusinessController extends Controller
             return response()->json(['error' => 'Failed to update product: ' . $e->getMessage()], 500);
         }
     }
+
+    public function updateVariant(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|integer|exists:business_products,id',
+            'variants'   => 'required|array|min:1',
+            'variants.*.variant' => 'required|string',
+            'variants.*.sku'     => 'required|string',
+            'variants.*.price'   => 'nullable|numeric|min:0',
+            'variants.*.quantity'=> 'nullable|integer|min:0',
+            'variants.*.isactive' => 'required|boolean',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->variants as $variantData) {
+                ProductVariant::updateOrCreate(
+                    [
+                        'product_id' => $request->product_id,
+                        'sku' => $variantData['sku']
+                    ],
+                    [
+                        'variant'  => $variantData['variant'],
+                        'price'    => $variantData['price'] ?? 0,
+                        'quantity' => $variantData['quantity'] ?? 0,
+                        'isactive' => $variantData['isactive'] ?? 0,
+                        'image'    => $variantData['image'] ?? null,
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product variants saved successfully.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save variants: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     
  
     public function deleteproductImage(Request $request)
@@ -602,7 +653,9 @@ class BusinessController extends Controller
                 $post->contact_phone,
                 $address,
                 $status,
-                $feature
+                $feature,
+                optional($post->created_at)->format('d-m-Y'),
+                optional($post->updated_at)->format('d-m-Y'),
             ];
         }
 
@@ -699,6 +752,10 @@ class BusinessController extends Controller
         }
     
         $validatedData = $validator->validated();
+
+        do {
+                    $uid = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+                } while (User::where('uid', $uid)->exists());
     
         $user = User::create([ 
             'name' => $validatedData['business_name'],
@@ -706,6 +763,7 @@ class BusinessController extends Controller
             'password' => Hash::make('@12345678'),
             'account_type' => 2,
             'is_admin_approved' => 1,
+            'uid'=>$uid
         ]);
     
         $businessInfo = new UserBusinessInfos($validatedData);
@@ -779,10 +837,15 @@ class BusinessController extends Controller
             $updatedRecords = [];
     
             foreach ($businessInfos as $info) {
+                do {
+                    $uid = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+                } while (User::where('uid', $uid)->exists());
+
                 $user = User::create([
                     'name' => $info->business_name,
                     'email' => $info->contact_email,
                     'password' => Hash::make('@12345678'),
+                    'uid'=>$uid,
                 ]);
     
                 $info->update(['user_id' => $user->id]);
@@ -1052,10 +1115,15 @@ class BusinessController extends Controller
         try {
             $result = ['data' => []];
 
-            $posts = BusinessProduct::select('id', 'title', 'business_id', 'product_id', 'category_id', 'price', 'mrp', 'description', 'main_image', 'video_url', 'status', 'feature')
-                ->with(['Category' => function ($query) {
-                    $query->select('id', 'name');
-                }])
+            $posts = BusinessProduct::select('id', 'title', 'business_id', 'product_id', 'category_id', 'price', 'mrp', 'description', 'main_image', 'video_url', 'status', 'feature','created_at','updated_at')
+                ->with([
+                    'Category' => function ($query) {
+                        $query->select('id', 'name');
+                    },
+                    'businessInfo' => function ($query) {
+                        $query->select('id','business_name'); // select needed fields
+                    }
+                ])
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($post) {
@@ -1073,6 +1141,14 @@ class BusinessController extends Controller
                     : '<img class="img img-thumbnail" src="' . asset('storage/no-image.jpg') . '" style="width:60px; height:60px;">';
 
                 $buttons = '';
+                $title = htmlspecialchars(addslashes($post->title), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); 
+                $businessName = htmlspecialchars(addslashes($post->businessInfo->business_name ?? '-'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); // ✅ direct from join
+
+                $buttons .= '<button type="button" class="btn btn-default btn-sm icon-btn" 
+                    onclick="downloadLabel(' 
+                    . $post->product_id . ', \'' . $title . '\', \'' . $businessName . '\')">
+                    <i class="fa fa-print"></i>
+                </button>';
                 $buttons .= '<a href="' . route('editBusinessProductData', ['bid' => $post->business_id, 'id' => $post->id]) . '" type="button" class="btn btn-default btn-sm" ><i class="fa fa-pencil" title="Edit products"></i></a>';
                 $buttons .= '<button type="button" class="btn btn-default btn-sm" onclick="removeFunc(' . $post->id . ')" data-bs-toggle="modal" data-bs-target="#removeModal"><i class="fa fa-trash"></i></button>';
 
@@ -1092,18 +1168,46 @@ class BusinessController extends Controller
                     ? mb_substr($cleanedDescription, 0, $charLimit, 'UTF-8') . '...'
                     : $cleanedDescription;
 
+                $price = $post->price;
+                $priceHtml = $price <= 0 
+                    ? '<span class="price-negative">' . $price . '</span>'
+                    : '<span class="price-positive">' . $price . '</span>'; 
+
+
+                $categoryColors = [
+                    'Weddings' => ['light' => '#cfe2ff', 'dark' => '#007bff'],
+                    'Home & Furnitures' => ['light' => '#d4edda', 'dark' => '#28a745'],
+                    'Art & Education' => ['light' => '#fff3cd', 'dark' => '#ffc107'],
+                    'Fashion' => ['light' => '#f8d7da', 'dark' => '#dc3545'],
+                    'Bags & Accessories' => ['light' => '#d1ecf1', 'dark' => '#17a2b8'],
+                    'Order Online' => ['light' => '#e2d9f9', 'dark' => '#6f42c1'],
+                    'Services' => ['light' => '#ffe5d0', 'dark' => '#fd7e14'],
+                    'Realstate' => ['light' => '#d1f7ec', 'dark' => '#20c997'],
+                ];
+
+                $categoryName1 = $categoryName;
+                $color = isset($categoryColors[$categoryName1]) ? $categoryColors[$categoryName1] : ['light' => '#e2e3e5', 'dark' => '#6c757d'];
+
+                $categoryHtml = '<span class="category-badge" style="background-color:' . $color['light'] . '; color:' . $color['dark'] . ';">
+                                    <span class="category-dot" style="background-color:' . $color['dark'] . ';"></span>
+                                    ' . $categoryName . '
+                                 </span>';
+
+
                 $result['data'][$key] = [
                     'DT_RowId' => 'item-' . $post->id,
                     $icon,
                     $post->product_id,
                     $cleanedTitle,
-                    $categoryName,
-                    $post->price,
+                    $categoryHtml,
+                    $priceHtml,
                     $post->mrp,
                     $shortDescription,
                     $post->video_url,
                     $status,
                     $feature,
+                    $post->created_at ? $post->created_at->format('d-m-Y') : '', // Safe formatting
+                    $post->updated_at ? $post->updated_at->format('d-m-Y') : '', // Safe formatting
                     $buttons,
                 ];
             }

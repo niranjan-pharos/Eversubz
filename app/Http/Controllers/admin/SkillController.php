@@ -27,7 +27,7 @@ class SkillController extends Controller
     public function fetchTableData(){
         $result = ['data' => []];
 
-        $skills = Skill::select('id','slug', 'skill_name','status')->get();
+        $skills = Skill::select('id','slug', 'skill_name','status','created_at','updated_at')->orderBy('id','DESC')->get();
         
         foreach ($skills as $key => $skill) {
             $buttons = ''; $status  =''; $icon= '';
@@ -48,6 +48,8 @@ class SkillController extends Controller
                 $skill->skill_name,
                 $skill->slug,
                 $status,
+                optional($skill->created_at)->format('d-m-Y'),
+                optional($skill->updated_at)->format('d-m-Y'),
                 $buttons,
             ];
         }

@@ -34,7 +34,8 @@
                             @if ($category->subCategories->count() > 0)
                                 <ul class="category-list">
                                     @foreach ($category->subCategories as $subCategory)
-                                        <li><a href="{{ route('products.index', [$category->slug, strtolower($subCategory->slug)]) }}">
+                                        <li>
+                                        <a href="{{ route('products.by_subcategory', [$category->slug, strtolower($subCategory->slug)]) }}">
                                                 <h6>{{ $subCategory->name }}</h6>
                                                 <p>({{ $subCategory->ad_posts_count }})</p>
                                             </a></li>

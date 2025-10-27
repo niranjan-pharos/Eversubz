@@ -60,7 +60,7 @@ li {
                     <a href="{{ route('listBusinessProduct',['id' => $bid])}} " class="btn btn-primary"
                         style="float:right"><i class="fa fa-mail-reply"></i> Product List </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="card mb-0">
                         <div class="card-body">
                             <form action="{{ route('business.products.update',['id' => $productInfo->id]) }}"
@@ -234,6 +234,265 @@ li {
                         </div>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="variants-card mt-3">
+                            <div class="adpost-title">
+                                <h4>Variants</h4>
+                            </div>
+                            <div class="info-box">
+                                Add variants if this product comes in multiple versions, like different sizes or colors.
+                            </div>
+
+                            <div class="variant-inputs" id="variant-inputs">
+                                <!-- Pre-added Size and Color -->
+                                <div class="variant-row">
+                                    <input type="text" name="option_name[]" value="Size">
+                                    <input type="text" name="option_value[]" class="variant-input" placeholder="e.g., S, M, L, XL">
+                                    <button type="button" class="remove-variant">×</button>
+                                </div>
+                                <div class="variant-row">
+                                    <input type="text" name="option_name[]" value="Color">
+                                    <input type="text" name="option_value[]" class="variant-input" placeholder="e.g., Red, Black, Blue">
+                                    <button type="button" class="remove-variant">×</button>
+                                </div>
+                            </div>
+
+                            <button type="button" id="add-variant-btn" style="background:#28a745;color:#fff;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;margin-bottom:10px;">
+                                <i class="fa fa-plus-square" aria-hidden="true"></i> Add Variant Type
+                            </button>
+
+                            <button type="button" id="update-variants-btn" style="background:#00c5fb;color:#fff;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;margin-bottom:10px;">
+                                Update
+                            </button>
+
+                            <p>Modify the variants to be created:</p>
+
+                            <table class="variant-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Variant</th>
+                                        <th>SKU</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="variant-table-body"></tbody>
+                            </table>
+                        </div>
+                </div>
+
+
+                    <style>
+                    .variants-card { background: #fff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px; font-family: Arial, sans-serif; margin-bottom:30px; }
+                    .variants-card h4 { margin-bottom: 10px; }
+                    .info-box { background: #dff0d8; color: #3c763d; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; }
+                    .variant-inputs { margin-bottom: 15px; }
+                    .variant-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+                    .variant-row input[type="text"] { flex: 1; padding: 6px 8px; border: 1px solid #d3d3d3; border-radius: 4px; }
+                    .variant-row input[readonly] { background:#f0f0f0; }
+                    .remove-variant { background:#5e5a5a;color:#fff;border:none;padding:0 10px;border-radius:4px;cursor:pointer; }
+                    .variant-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top:10px; }
+                    .variant-table th, 
+                    .variant-table td {
+                        border: none;               /* remove all borders first */
+                        border-bottom: 1px solid #d3d3d3; /* only bottom border */
+                        padding: 6px 10px;
+                        text-align: center;
+                    }
+                    .variant-table th { background: #f7f7f7; }
+                    .variant-table input[type="number"] { width: 70px; padding: 4px 6px; border: 1px solid #d3d3d3; border-radius: 4px; text-align: right; }
+                    .btn-upload { background: #007bff; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+                    .btn-upload:hover { background: #0066ff; }
+                    .variant-table td { vertical-align: middle; }
+                    .eye-icon { cursor: pointer; margin-left: 5px; color: #007bff; }
+
+                    /* 📱 Responsive Styles */
+                    @media (max-width: 768px) {
+                        .variant-row {
+                            flex-direction: column; /* stack inputs vertically */
+                            align-items: stretch;
+                        }
+                        .variant-row input[type="text"] {
+                            width: 100%;
+                        }
+                        .remove-variant {
+                            align-self: flex-end;
+                            margin-top: 5px;
+                        }
+                        .variant-table {
+                            display: block;
+                            overflow-x: auto; /* scroll horizontally if needed */
+                            white-space: nowrap;
+                        }
+                        .variant-table th,
+                        .variant-table td {
+                            font-size: 12px;
+                            padding: 5px;
+                        }
+                        .btn-upload {
+                            width: 100%;
+                            text-align: center;
+                            margin-top: 8px;
+                        }
+                    }
+
+                    @media (max-width: 480px) {
+                        .variants-card {
+                            padding: 10px;
+                        }
+                        .info-box {
+                            font-size: 12px;
+                            padding: 6px 10px;
+                        }
+                        .variant-table input[type="number"] {
+                            width: 50px;
+                        }
+                    }
+
+
+                    </style>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const variantInputsContainer = document.getElementById('variant-inputs');
+                            const addVariantBtn = document.getElementById('add-variant-btn');
+                            const tableBody = document.getElementById('variant-table-body');
+                            let skuCounter = 1;
+
+                            const existingVariants = @json($productVariantInfo ?? []);
+
+                            function updateTable() {
+                                tableBody.innerHTML = '';
+                                const variantRows = document.querySelectorAll('.variant-row');
+                                let hasRecords = false;
+
+                                variantRows.forEach(row => {
+                                    const nameInput = row.querySelector('input[name="option_name[]"]');
+                                    const valueInput = row.querySelector('input[name="option_value[]"]');
+                                    const name = nameInput.value.trim();
+                                    const values = valueInput.value.split(',').map(v => v.trim()).filter(Boolean);
+
+                                    if(name && values.length > 0) {
+                                        hasRecords = true;
+                                        values.forEach(val => {
+                                            const tr = document.createElement('tr');
+                                            tr.innerHTML = `
+                                                <td><input type="checkbox" checked></td>
+                                                <td><span style="color:#0066ff">${val}</span> • ${name}</td>
+                                                <td>#SKU${skuCounter.toString().padStart(6,'0')}</td>
+                                                <td><input type="number" value="0.00"></td>
+                                                <td><input type="number" value="0"></td>
+                                                <td><button type="button" class="btn-upload"><i class="fa fa-upload"></i> Upload Image</button></td>
+                                            `;
+                                            tableBody.appendChild(tr);
+                                            skuCounter++;
+                                        });
+                                    }
+                                });
+
+                                if(existingVariants.length > 0) {
+                                    existingVariants.forEach(v => {
+                                        const tr = document.createElement('tr');
+                                        tr.innerHTML = `
+                                            <td><input type="checkbox" ${v.isactive ? 'checked' : ''}></td>
+                                            <td><span style="color:#0066ff">${v.variant}</span></td>
+                                            <td>${v.sku}</td>
+                                            <td><input type="number" value="${v.price}" step="0.01"></td>
+                                            <td><input type="number" value="${v.quantity}"></td>
+                                            <td>
+                                                <button type="button" class="btn-upload"><i class="fa fa-upload"></i></button>
+                                                ${v.image ? `<i class="fa fa-eye eye-icon" data-img="${v.image}" style="margin-left:5px;cursor:pointer;"></i>` : ''}
+                                            </td>
+                                        `;
+                                        tableBody.appendChild(tr);
+                                    });
+                                    hasRecords = true;
+                                }
+
+                                if(!hasRecords) {
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `<td colspan="6" style="text-align:center; color:#888;">Record not found</td>`;
+                                    tableBody.appendChild(tr);
+                                }
+                            }
+
+                            variantInputsContainer.addEventListener('input', function(e) {
+                                if(e.target.classList.contains('variant-input')) updateTable();
+                            });
+
+                            addVariantBtn.addEventListener('click', function() {
+                                const newRow = document.createElement('div');
+                                newRow.classList.add('variant-row');
+                                newRow.innerHTML = `
+                                    <input type="text" name="option_name[]" placeholder="Option name (e.g., Material)">
+                                    <input type="text" name="option_value[]" class="variant-input" placeholder="Option values separated by commas">
+                                    <button type="button" class="remove-variant">×</button>
+                                `;
+                                variantInputsContainer.appendChild(newRow);
+                            });
+
+                            variantInputsContainer.addEventListener('click', function(e) {
+                                if(e.target.classList.contains('remove-variant')) {
+                                    e.target.closest('.variant-row').remove();
+                                    updateTable();
+                                }
+                            });
+
+                            updateTable();
+                        });
+
+                        document.getElementById('update-variants-btn').addEventListener('click', function() {
+                            const tableRows = document.querySelectorAll('#variant-table-body tr');
+                            const variants = [];
+                            const productId = @json($productInfo->id ?? 1);
+
+                            tableRows.forEach(row => {
+                                const isactive = row.querySelector('input[type="checkbox"]').checked;
+                                const variant = row.cells[1]?.textContent.trim() || '';
+                                const sku = row.cells[2]?.textContent.trim() || '';
+                                const numberInputs = row.querySelectorAll('input[type="number"]');
+                                const price = numberInputs[0] ? numberInputs[0].value : 0;
+                                const quantity = numberInputs[1] ? numberInputs[1].value : 0;
+
+                                variants.push({ 
+                                    variant, 
+                                    sku, 
+                                    price, 
+                                    quantity, 
+                                    isactive, 
+                                    image: null 
+                                });
+                            });
+
+                            fetch('{{ route("business.products.variant.update", ["id" => $productInfo->id]) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ product_id: productId, variants })
+                            })
+                            .then(async res => {
+                                const text = await res.text();
+                                try { 
+                                    return JSON.parse(text); 
+                                } catch (e) { 
+                                    console.error('Server returned non-JSON:', text); 
+                                    throw new Error('Invalid JSON: ' + text); 
+                                }
+                            })
+                            .then(data => {
+                                if (data.success) toastr.success(data.message);
+                                else toastr.error(data.message || 'Something went wrong.');
+                            })
+                            .catch(err => console.error('Request failed:', err));
+                        });
+
+                    </script>
+
             </div>
         </div>
     </div>

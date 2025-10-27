@@ -37,6 +37,7 @@ class FundraisingsController extends Controller
             'apiPassword' => config('services.commbank.api_password'),
         ];
     }
+    
 
     public function index()
     {

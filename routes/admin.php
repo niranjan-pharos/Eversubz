@@ -29,6 +29,7 @@ use App\Http\Controllers\admin\ProfessionalController;
 use App\Http\Controllers\admin\TicketCategoryController;
 use App\Http\Controllers\admin\SkillController;
 use App\Http\Controllers\admin\AttributesController;
+use App\Http\Controllers\admin\DonationPackageController;
 use Illuminate\Support\Facades\Route;
 
 // Unprotected login routes
@@ -153,6 +154,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
     Route::get('/view-business/{id}', [BusinessController::class, 'viewBusiness'])->name('viewBusiness');
     Route::get('/edit-business-product/{bid}/{id}', [BusinessController::class, 'editBusinessProduct'])->name('editBusinessProductData');
     Route::post('/product-update/{id}', [BusinessController::class, 'updateProduct'])->name('business.products.update');
+    Route::post('/product-variant-update/{id}', [BusinessController::class, 'updateVariant'])->name('business.products.variant.update');
     ROute::get('/updateBusinessRecords',[BusinessController::class, 'updateUserBusinessInfos']);
     
     // Ngo Category
@@ -202,6 +204,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
     Route::get('/fundraising/{fundraising}', [FundraisingController::class, 'show'])->name('adminfundraisingShow');
     Route::get('/donation/{fundraising}', [FundraisingController::class, 'Donation'])->name('adminDonationShow');
     Route::get('/donation-list', [FundraisingController::class, 'fetchDonationgData'])->name('adminDonationList');
+
+    Route::prefix('donation-packages')->group(function() {
+        Route::get('/', [DonationPackageController::class, 'index'])->name('adminDonationPackages');
+        Route::get('fetch-data', [DonationPackageController::class, 'fetchTableData'])->name('adminDonationPackagesList');
+        Route::get('/add', [DonationPackageController::class, 'create'])->name('adminDonationPackageCreate');
+        Route::post('/store', [DonationPackageController::class, 'store'])->name('adminDonationPackageStore');
+        Route::get('{id}', [DonationPackageController::class, 'show'])->name('adminDonationPackageShow');
+        Route::put('{id}', [DonationPackageController::class, 'update']);
+        Route::put('change-featured', [DonationPackageController::class, 'changeFeatured'])->name('donationChangeFeatured');
+        Route::put('status/change', [DonationPackageController::class, 'changeStatus'])->name('donationPackageChangeStatus');
+        Route::delete('delete/{id}', [DonationPackageController::class, 'destroy'])->name('donationPackageDestroy');
+    });
+
+    Route::get('/donation-payment-listing', [DonationPackageController::class, 'listingData'])->name('adminDonationPackagesListing');
+        Route::get('/fetch-listing-data', [DonationPackageController::class, 'fetchTableListingData'])->name('adminDonationPaymentList');
 
     //  faq category 
     Route::get('/faq-categories', [FaqCategoryController::class, 'index'])->name('faqCategory');
@@ -287,6 +304,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
     Route::get('/ticketorderlist', [OrderController::class, 'fetchTableData'])->name('adminticketorderList');
     // Route for viewing order details
     Route::get('/orders/ticket/{id}', [OrderController::class, 'viewOrder'])->name('viewOrder');
+
+    // Route for PDF download order Product Invoice
+    Route::get('/order/print/{id}', [OrderController::class, 'printInvoice'])->name('orderitem.print');
+    Route::get('/order/pdf/{id}', [OrderController::class, 'downloadPDF'])->name('orderitem.download.pdf');
+
 
     Route::get('/orders/itemorders', [OrderController::class, 'orderitem'])->name('orderitem');
     Route::get('/orders/itemorders/data', [OrderController::class, 'fetchOrderItemsData'])->name('orderitems.data');

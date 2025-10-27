@@ -28,7 +28,10 @@
             <div class="col-sm-6 col-md-6 col-lg-5">
                 <div class="footer-info">
 
-                    <a href="#"><img src="{{ asset('assets/images/logo.png') }}" alt="logo"></a>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <a href="/"><img loading="lazy" src="{{ asset('main_assets/images/logo.png') }}" alt="logo"></a>
+                        <a href="/"><img loading="lazy" src="{{ asset('assets/images/sub_future_logo.png') }}" alt="logo"></a>
+                    </div>
                     <p>
                         Welcome to EverSabz, your premier online marketplace for a wide array of categories including
                         Electronics, Food & Dining, Entertainment, Sports, Automotive, Fashion & Clothing, Furniture,

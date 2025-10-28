@@ -181,21 +181,34 @@
             });
 
             $('.continue-btn').on('click', function () {
-                let id = $(this).data('id');
-                if (confirm('Are you sure you want to delete this enquiry?')) {
-                    $.ajax({
-                        method: 'DELETE',
-                        data: {
-                            "_token": "{{ csrf_token() }}",
-                            slug: slug
-                        },
-                        success: function (response) {
-                            toastr.success(response.message);
-                            $('#delete_category').modal('hide');
-                            donationPackagesTable.ajax.reload();
-                        }
-                    });
+                let id = $(this).data('slug');
+
+                if (!id) {
+                    toastr.error("Something went wrong!");
+                    return;
                 }
+
+                $.ajax({
+                    url: '{{ route("donationPackageDestroy", ":id") }}'.replace(':id', id),
+                    method: 'DELETE',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        toastr.success(response.message || "Deleted successfully!");
+                        $('#delete_category').modal('hide');
+
+                        if ($.fn.DataTable.isDataTable('#donationPackagesTable')) {
+                            $('#donationPackagesTable').DataTable().ajax.reload(null, false);
+                        } else {
+                            $('.delete-btn[data-slug="' + id + '"]').closest('.donation-card').remove();
+                        }
+
+                    },
+                    error: function () {
+                        toastr.error("Failed to delete. Please try again.");
+                    }
+                });
             });
         });
 

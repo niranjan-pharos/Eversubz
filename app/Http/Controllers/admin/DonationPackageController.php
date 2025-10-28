@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\DonationPackage;
 use App\Models\DonatePackage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class DonationPackageController extends Controller
 {
@@ -254,7 +255,7 @@ class DonationPackageController extends Controller
             $donation_packagge = DonationPackage::find($request->id);
 
             if ($donation_packagge) {
-                $newStatus = filter_var($request->status, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+                $newStatus = $donation_packagge->status == 0 ? 1 : 0;
 
                 $donation_packagge->status = $newStatus;
                 $donation_packagge->save();

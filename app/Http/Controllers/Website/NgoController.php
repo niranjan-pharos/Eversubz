@@ -66,7 +66,7 @@ class NgoController extends Controller
         ->orderBy('ngos_count', 'desc')
         ->get();
 
-        $donationPackages = DonationPackage::select('id', 'name', 'image', 'price', 'quantity', 'status', 'created_at', 'updated_at', 'ngo_id')
+        $donationPackages = DonationPackage::select('id', 'name', 'image','status', 'price', 'quantity', 'status', 'created_at', 'updated_at', 'ngo_id')
             ->orderBy('id', 'desc')
             ->get();
 

@@ -707,43 +707,48 @@
                 </div>
                 <div id="donation-container" class="flex flex-wrap -mx-3">
                     @foreach($donationPackages as $index => $donationPackage)
-                        <div class="donation-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-3 mb-6" 
-                             style="{{ $index >= 4 ? 'display:none;' : '' }}">
-                            <div class="card bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition duration-300">
-                                <a href="{{ route('ngo.donationpackege', ['id' => urlencode(Crypt::encryptString($donationPackage->id))]) }}">
-                                    <div class="card-media h-40 overflow-hidden relative">
-                                        <img src="{{ asset('storage/' . $donationPackage->image) }}" 
-                                             alt="{{ $donationPackage->name }}" 
-                                             class="w-full h-full object-cover">
-                                        <div class="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-20 transition"></div>
-                                    </div>
-                                </a>
-                                <div class="card-body p-4">
+                        @if($donationPackage->status == 1)
+                            <div class="donation-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-3 mb-6"
+                                 style="{{ $index >= 4 ? 'display:none;' : '' }}">
+                                <div class="card bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition duration-300">
                                     <a href="{{ route('ngo.donationpackege', ['id' => urlencode(Crypt::encryptString($donationPackage->id))]) }}">
-                                        <h4 class="card-title text-lg font-semibold text-gray-800">
-                                            {{ Str::limit($donationPackage->name, 30, '...') }}
-                                        </h4>
+                                        <div class="card-media h-40 overflow-hidden relative">
+                                            <img src="{{ asset('storage/' . $donationPackage->image) }}"
+                                                 alt="{{ $donationPackage->name }}"
+                                                 class="w-full h-full object-cover">
+                                            <div class="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-20 transition"></div>
+                                        </div>
                                     </a>
-                                    <div class="card-text mt-2">
-                                        <p class="text-gray-600">
-                                            Price - <span class="text-blue-600 font-semibold">
-                                                ${{ number_format($donationPackage->price, 2) }}
-                                            </span>
-                                        </p>
+                                    <div class="card-body p-4">
+                                        <a href="{{ route('ngo.donationpackege', ['id' => urlencode(Crypt::encryptString($donationPackage->id))]) }}">
+                                            <h4 class="card-title text-lg font-semibold text-gray-800">
+                                                {{ Str::limit($donationPackage->name, 30, '...') }}
+                                            </h4>
+                                        </a>
+                                        <div class="card-text mt-2">
+                                            <p class="text-gray-600">
+                                                Price -
+                                                <span class="text-blue-600 font-semibold">
+                                                    ₹{{ number_format($donationPackage->price, 2) }}
+                                                </span>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     @endforeach
                 </div>
 
-                @if($donationPackages->count() > 4)
+                @if($donationPackages->where('status', 1)->count() > 4)
                     <div class="text-center mt-6">
-                        <button id="viewMoreBtnPackage" class="px-5 load-more-btn py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
+                        <button id="viewMoreBtnPackage"
+                            class="px-5 load-more-btn py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
                             View More
                         </button>
                     </div>
                 @endif
+
 
 
                 <script>

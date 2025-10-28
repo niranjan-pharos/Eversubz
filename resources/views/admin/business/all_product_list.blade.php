@@ -452,7 +452,7 @@
                     container.style.alignItems = "center";
                     container.style.lineHeight = "1";
                     container.style.fontFamily = "Arial, sans-serif";
-                    container.style.padding = "1mm";
+                    container.style.padding = "2mm";
                     container.style.boxSizing = "border-box";
                     container.style.overflow = "hidden";
 
@@ -465,8 +465,8 @@
                         </div>
                         <hr style="width:90%; margin:1mm 0;">
                         <svg id="barcode"></svg>
-                        <div style="text-align:center; font-size:6pt; margin:1mm 0;">${postId}</div>
-                        <div style="text-align:center; font-size:6pt;">DO NOT REMOVE!</div>
+                        <div style="text-align:center; font-size:8pt; margin:1mm 0;">${postId}</div>
+                        <div style="text-align:center; font-size:8pt;">DO NOT REMOVE!</div>
                     `;
 
                     document.body.appendChild(container);
@@ -518,8 +518,10 @@
                             container.remove();
                             style.remove();
                         };
-                    }, 500);
+                    }, 300);
                 }
+
+
         </script>
 
 

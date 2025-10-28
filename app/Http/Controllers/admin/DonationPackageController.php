@@ -8,6 +8,8 @@ use App\Models\DonationPackage;
 use App\Models\DonatePackage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use App\Models\DonationPackageImage;
 
 class DonationPackageController extends Controller
 {
@@ -40,6 +42,8 @@ class DonationPackageController extends Controller
             $buttons = '';
             $feature = '';
             $status = '';
+
+            $buttons .= '<a href="' . route('editDonationPackageData', ['id' => $package->id]) . '" type="button" class="btn btn-default btn-sm" ><i class="fa fa-pencil" title="Edit Donation"></i></a>';
             
             $buttons .= '<button type="button" class="btn btn-default btn-sm icon-btn" onclick="viewFunc(' . $package->id . ')"><i class="fa fa-eye"></i></button>';
             $buttons .= '<button type="button" class="btn btn-default btn-sm icon-btn" onclick="removeFunc(\'' . $package->id . '\')" ><i class="fa fa-trash"></i></button>';
@@ -219,30 +223,71 @@ class DonationPackageController extends Controller
 
     public function edit($id)
     {
-        // Optionally, you can return a view to edit the donation package
+        $product_id = $id;
+        
+
+        $donationInfo = DonationPackage::with('gallery')->findOrFail($product_id);
+        if (!$donationInfo) {
+            return redirect()->back()->with('error', 'Donation Package not found.');
+        }
+        $product_title = $donationInfo->name;
+        $breadcrumbs = [
+            ['label' => 'Dashboard', 'url' => route('adminDashboard')],
+            ['label' => 'Donation Package', 'url' => route('adminDonationPackages')],
+            ['label' => "Edit Donation Package - $product_title", 'url' => null]
+        ]; 
+        return view('admin.donationa_packages.edit_package', compact('breadcrumbs','donationInfo'));
     }
 
     public function update(Request $request, $id)
     {
-        $donationPackage = DonationPackage::find($id);
+        $donation = DonationPackage::findOrFail($id);
 
-        if (!$donationPackage) {
-            return response()->json(['message' => 'Donation package not found'], 404);
-        }
-
-        $validated = $request->validate([
-            'ngo_id' => 'required|exists:ngos,id',
+        $data = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'required|string',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
+            'price' => 'nullable|numeric',
+            'quantity' => 'nullable|integer',
+            'in_packages' => 'nullable|string',
+            'description' => 'nullable|string',
+            'status' => 'nullable|boolean',
+            'image' => 'nullable|image|max:2048',
+            'gallery.*' => 'nullable|image|max:2048',
         ]);
 
-        $donationPackage->update($validated);
+        // ✅ Handle main image
+        if ($request->hasFile('image')) {
+            // delete old image if exists
+            if ($donation->image && Storage::disk('public')->exists($donation->image)) {
+                Storage::disk('public')->delete($donation->image);
+            }
 
-        return response()->json($donationPackage);
+            $data['image'] = $request->file('image')->store('donation_packages', 'public');
+        }
+
+        // ✅ Update main donation data
+        $data['status'] = $request->has('status') ? 1 : 0;
+        $donation->update($data);
+
+        // ✅ Handle multiple gallery uploads (create separate DB records)
+        if ($request->hasFile('gallery')) {
+            $position = DonationPackageImage::where('donation_package_id', $donation->id)->max('position') ?? 0;
+
+            foreach ($request->file('gallery') as $file) {
+                if ($file->isValid()) {
+                    $path = $file->store('donation-package/gallery', 'public');
+
+                    DonationPackageImage::create([
+                        'donation_package_id' => $donation->id,
+                        'image' => $path,
+                        'position' => ++$position,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['message' => 'Donation package updated successfully!']);
     }
+
 
     public function changeStatus(Request $request)
     {
@@ -288,5 +333,25 @@ class DonationPackageController extends Controller
         $donationPackage->delete();
 
         return response()->json(['status' => true, 'message' => 'Donation package deleted successfully']);
+    }
+
+
+    public function deleteGallery(Request $request)
+    {
+        $image = DonationPackageImage::find($request->id);
+
+        if (!$image) {
+            return response()->json(['message' => 'Image not found.'], 404);
+        }
+
+        // Delete file from storage
+        if (Storage::disk('public')->exists($image->image)) {
+            Storage::disk('public')->delete($image->image);
+        }
+
+        // Delete DB record
+        $image->delete();
+
+        return response()->json(['message' => 'Gallery image deleted successfully.']);
     }
 }

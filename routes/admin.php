@@ -211,7 +211,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
         Route::get('/add', [DonationPackageController::class, 'create'])->name('adminDonationPackageCreate');
         Route::post('/store', [DonationPackageController::class, 'store'])->name('adminDonationPackageStore');
         Route::get('{id}', [DonationPackageController::class, 'show'])->name('adminDonationPackageShow');
-        Route::put('{id}', [DonationPackageController::class, 'update']);
+        Route::put('{id}', [DonationPackageController::class, 'update'])->name('adminDonationPackageUpdate');
         Route::put('change-featured', [DonationPackageController::class, 'changeFeatured'])->name('donationChangeFeatured');
         Route::put('status/change', [DonationPackageController::class, 'changeStatus'])->name('donationPackageChangeStatus');
         Route::delete('delete/{id}', [DonationPackageController::class, 'destroy'])->name('donationPackageDestroy');
@@ -219,6 +219,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
 
     Route::get('/donation-payment-listing', [DonationPackageController::class, 'listingData'])->name('adminDonationPackagesListing');
         Route::get('/fetch-listing-data', [DonationPackageController::class, 'fetchTableListingData'])->name('adminDonationPaymentList');
+     Route::get('edit-donation-package/{id}', [DonationPackageController::class, 'edit'])->name('editDonationPackageData');
+
+     Route::post('/delete-donation-package-image', [DonationPackageController::class, 'deleteGallery'])
+    ->name('adminDonationGalleryDelete');
+
 
     //  faq category 
     Route::get('/faq-categories', [FaqCategoryController::class, 'index'])->name('faqCategory');

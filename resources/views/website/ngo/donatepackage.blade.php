@@ -622,7 +622,7 @@ input[type=range] {
                             <!-- Amount Input Section -->
                             <div class="row mt-1">
                                 <div class="col-12 col-md-4 amount-input-container">
-                                    <input type="number" class="form-control custom-input widthforamountcard" id="amount" placeholder="Enter Amount in AUD" step="1" min="0" value="{{$price}}">
+                                    <input type="number" class="form-control custom-input widthforamountcard" id="amount" placeholder="Enter Amount in AUD" step="1" min="0" value="{{$price}}" readonly>
                                     @error('amount')
                                         <div class="text-danger mt-2">{{ $message }}</div>
                                     @enderror
@@ -630,6 +630,7 @@ input[type=range] {
                             </div>
 
                             <input type="hidden" name="fundraising_id" id="fundraising_id" value="{{$encryptedId}}">
+                            <input type="hidden" name="quantity" id="quantity" value="{{$quantity}}">
                             
                             <!-- Tip Percentage Section with Switcher -->
                             <div class="row ">
@@ -671,8 +672,6 @@ input[type=range] {
                                 <div class="col-12">
 
                                     <div class="">
-
-                                        <input type="checkbox" name="coverTransactionCosts" id="cover-transaction-costs" value="1">
                                         <label class="form-check-label" for="cover-transaction-costs" style="font-weight: 500;">
                                         Cover Transaction Costs
                                         </label>
@@ -1254,7 +1253,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalDisplay = document.getElementById('total-display');
     const donateButton = document.getElementById('donate-btn');
     const form = document.getElementById('donation-form');
-    const coverTransactionCostsCheckbox = document.getElementById('cover-transaction-costs');
     const tipSwitcher = document.getElementById('tip-switcher');
     const tipAmountDisplay = document.getElementById('tip-amount');
 
@@ -1264,18 +1262,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAmountAndTipSections() {
         const amount = Number(amountInput.value) || 0;
         const tipValue = (tipSwitcher.value / 100) * amount;
-        const transactionFee = coverTransactionCostsCheckbox.checked ? (amount * 0.029) + 0.3 : 0;
+        const transactionFee = (amount * 0.029) + 0.3;
         const totalAmount = amount + tipValue + transactionFee;
 
         displayAmount.textContent = `$${amount.toFixed(2)}`;
         displayTip.textContent = `$${tipValue.toFixed(2)}`;
 
-        if (coverTransactionCostsCheckbox.checked) {
-            displayTransactionFee.textContent = `$${transactionFee.toFixed(2)}`;
+        displayTransactionFee.textContent = `$${transactionFee.toFixed(2)}`;
             document.getElementById('transaction-fee-section').style.display = 'flex';
-        } else {
-            document.getElementById('transaction-fee-section').style.display = 'none';
-        }
 
         totalDisplay.textContent = `$${totalAmount.toFixed(2)}`;
     }
@@ -1312,10 +1306,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateAmountAndTipSections();
         const value = (this.value - this.min)/(this.max - this.min)*100;
         this.style.background = `linear-gradient(to right, rgb(44 91 168) 0%, rgb(43 88 167) ${value}%, #ddd ${value}%, #ddd 100%)`;
-    });
-
-    coverTransactionCostsCheckbox.addEventListener('change', function() {
-        updateAmountAndTipSections();
     });
 
     const infoIcon = document.getElementById('info-icon');
@@ -1385,6 +1375,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     anonymous: form.querySelector('[name="anonymous"]').checked ? 1 : 0,
                     message: form.querySelector('[name="message"]').value,
                     fundraising_id: form.querySelector('[name="fundraising_id"]').value,
+                    quantity: form.querySelector('[name="quantity"]').value,
                     tipPercentage: form.querySelector('[name="tipPercentage"]').value,
                     coverTransactionCosts: form.querySelector('[name="coverTransactionCosts"]').value,
                 };
@@ -1409,7 +1400,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     amountInput.value = selectedAmount = Number('{{ $price }}');
                     tipSwitcher.value = 0;
                     tipAmountDisplay.textContent = '0%';
-                    coverTransactionCostsCheckbox.checked = false;
                     updateAmountAndTipSections();
                     window.location.href = '{{ route("donations.success") }}';
                 } else toastr.error(data.message || 'An error occurred during donation.');

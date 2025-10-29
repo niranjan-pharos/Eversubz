@@ -286,7 +286,7 @@ Route::get('author/{slug}', [HomeController::class, 'userProfile'])->name('selle
     Route::post('leave-ngo', [NgoController::class, 'leave'])->name('user.leave');
     Route::get('create-ngo', [NgoController::class, 'register'])->name('ngo.create');
     Route::post('/process-ngo-register', [NgoController::class, 'storeNgo'])->name('ngo.stores');
-    Route::get('donation-support/{id}/{price}', [NgoController::class, 'support'])->name('donation.support');
+    Route::get('donation-support/{id}/{price}/{quantity}', [NgoController::class, 'support'])->name('donation.support');
     Route::post('donation/donations', [NgoController::class, 'saveDonation'])->name('donations.save');
     Route::post('donation/test', [NgoController::class, 'testDonation'])->name('donation.test');
 

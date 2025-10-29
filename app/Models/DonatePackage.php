@@ -17,6 +17,7 @@ class DonatePackage extends Model
         'phone_number',
         'country',
         'message',
+        'quantity',
         'amount',
         'tip',
         'transaction_fee',

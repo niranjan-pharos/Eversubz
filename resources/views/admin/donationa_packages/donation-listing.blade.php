@@ -18,6 +18,7 @@
                                             <th>Email</th>
                                             <th>Phone Number</th>
                                             <th>Amount</th>
+                                            <th>Quantity</th>
                                             <th>Total Amount</th>
                                             <th>Payment Status</th>
                                             <th>Donation Number</th>

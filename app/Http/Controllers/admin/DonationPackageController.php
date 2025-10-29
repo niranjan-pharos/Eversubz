@@ -125,6 +125,7 @@ class DonationPackageController extends Controller
                 $package->email,
                 $package->phone_number ?? '-',
                 $package->amount,
+                $package->quantity,
                 $package->total_amount,
                 $itemStatusHtml,
                 $package->donation_number,

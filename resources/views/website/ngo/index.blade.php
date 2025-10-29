@@ -277,6 +277,10 @@
             border-color: #5a6268
         }
 
+        a h4:hover{
+            color: #0056b3 !important;
+        }
+
         @media only screen and(max-width:767px) {
             .mobile-view-sections {
                 display: none !important
@@ -707,7 +711,6 @@
                 </div>
                 <div id="donation-container" class="flex flex-wrap -mx-3">
                     @foreach($donationPackages as $index => $donationPackage)
-                        @if($donationPackage->status == 1)
                             <div class="donation-card w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-3 mb-6"
                                  style="{{ $index >= 4 ? 'display:none;' : '' }}">
                                 <div class="card bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition duration-300">
@@ -729,18 +732,17 @@
                                             <p class="text-gray-600">
                                                 Price -
                                                 <span class="text-blue-600 font-semibold">
-                                                    ₹{{ number_format($donationPackage->price, 2) }}
+                                                    {{ config('constants.CURRENCY_SYMBOL') }} {{ number_format($donationPackage->price, 2) }}
                                                 </span>
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endif
                     @endforeach
                 </div>
 
-                @if($donationPackages->where('status', 1)->count() > 4)
+                @if($donationPackages->count() > 4)
                     <div class="text-center mt-6">
                         <button id="viewMoreBtnPackage"
                             class="px-5 load-more-btn py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">

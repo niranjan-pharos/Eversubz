@@ -581,21 +581,15 @@
                                         <div>
                                             <div class="alldonor-date">{{ $donor->created_at->format('D, j M Y') }}</div>
                                             <div class="alldonor-name">
-                                                {{ $donor->is_anonymous == 1 ? 'Anonymous' : ($donor->user->name ?? 'Unknown') }}
+                                                {{ $donor->anonymous == 1 ? 'Anonymous' : ($donor->user->name ?? 'Unknown') }}
                                             </div>
                                             <div class="side-list-info">
-                                                Reference No. {{ $donor->latest_donation_number }}
+                                                Reference No. {{ $donor->donation_number }}
                                                 <br>
-                                                {{-- Show relative donation time --}}
-                                                <!-- @if($donor->last_donation_time)
-                                                    <span class="text-sm text-gray-500">
-                                                        {{ \Carbon\Carbon::parse($donor->last_donation_time)->diffForHumans() }}
-                                                    </span>
-                                                @endif -->
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="alldonor-amount">${{ number_format($donor->total_amount, 2) }}</div>
+                                    <div class="alldonor-amount">${{ number_format($donor->amount, 2) }}</div>
                                 </div>
                             @endforeach
                         </div>

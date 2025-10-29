@@ -72,27 +72,23 @@ class FundraisingsController extends Controller
             ])
             ->firstOrFail();
 
+
         $encryptedNgoId = $fundraiser->ngo ? Crypt::encrypt($fundraiser->ngo->id) : null;
+
 
         $goalAmount  = $fundraiser->amount;
         $totalRaised = Donation::where('fundraising_id', $fundraiser->id)->sum('amount');
         $memberCount = $fundraiser->ngo ? $fundraiser->ngo->members()->count() : 0;
         $ngoInfo     = $fundraiser->ngo;
 
-        $topDonors = Donation::where('fundraising_id', $fundraiser->id)
-            ->select(
-                'user_id',
-                'created_at',
-                \DB::raw('SUM(amount) as total_amount'),
-                \DB::raw('MAX(anonymous) as is_anonymous'),
-                \DB::raw('MAX(donation_number) as latest_donation_number'),
-                \DB::raw('MAX(created_at) as last_donation_time')
-            )
-            ->groupBy('user_id')
-            ->orderByDesc('total_amount')
-            ->with('user')
+        $topDonors = Donation::with('user')
+            ->where('fundraising_id', $fundraiser->id)
+            ->orderByDesc('amount')
+            ->get()
+            ->unique('user_id')
             ->take(5)
-            ->get();
+            ->values();
+
 
         $allDonors = Donation::where('fundraising_id', $fundraiser->id)
             ->with('user')

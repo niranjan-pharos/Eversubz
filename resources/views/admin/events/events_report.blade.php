@@ -20,6 +20,7 @@
                                         <th>User Name</th>
                                         <th>Reason</th>
                                         <th>Report Date</th>
+                                        <th>Updated Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -35,6 +36,36 @@
     </div>
 </div>
 <!-- Delete confirmation Modal -->
+
+<div class="modal custom-modal fade" tabindex="-1" role="dialog" id="removeModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header remove">
+
+                <h4 class="modal-title">Remove Report</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <form method="DELETE" id="removeForm">
+                @csrf
+                @method('DELETE')
+                <div class="modal-body">                   
+                    <p>Do you really want to remove?</p>
+                </div>
+                <input type="hidden" name="id" id="id">
+                <div class="modal-footer modal-footer-uniform">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger submit-btn">Delete Report</button>
+                    <!--<button type="submit" class="btn btn-primary">Save changes</button>-->
+                </div>
+            </form>
+
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
 
 <style>
 .custom-table {
@@ -70,6 +101,56 @@
 
 <script>
         $(document).ready(function () {
+            var base_url = "{{ url('/admin/') }}";
+            var reportTable;
+
+            reportTable = $('#reportTable').DataTable({
+                'ajax': "{{ route('admin.ajax.event.reports') }}",
+                'order': [],
+                dom: '<"row mb-3" <"col-md-4"l> <"col-md-4 text-center"B> <"col-md-4 d-flex justify-content-end"f> >rtip',
+                buttons: [
+                  {
+                    extend: 'collection',
+                    text: '<i class="fa fa-print"></i> Export',
+                    className: 'btn btn-outline-dark',
+                    buttons: [
+                      { extend: 'print', text: 'Print' },
+                      { extend: 'excelHtml5', text: 'Excel' },
+                      { extend: 'csvHtml5', text: 'CSV' },
+                      { extend: 'pdfHtml5', text: 'PDF', orientation: 'landscape', pageSize: 'A4' },
+                      {
+                        text: 'Word',
+                        action: function ( e, dt, node, config ) {
+                          var data = dt.buttons.exportData({decodeEntities: true});
+
+                          var html = '<table border="1">';
+                          html += '<tr>' + data.header.map(h => '<th>' + h + '</th>').join('') + '</tr>';
+                          data.body.forEach(row => {
+                            html += '<tr>' + row.map(cell => {
+                                var div = document.createElement('div');
+                                div.innerHTML = cell;
+                                var img = div.querySelector('img');
+                                if(img) return '<td>' + img.src + '</td>';
+                                return '<td>' + div.textContent + '</td>';
+                            }).join('') + '</tr>';
+                          });
+                          html += '</table>';
+
+                          var blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                          var url = URL.createObjectURL(blob);
+                          var a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'Orders.doc';
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                        }
+                      }
+                    ]
+                  }
+                ]
+            });
+
             function fetchReports() {
                 $.ajax({
                     url: '{{ route('admin.ajax.event.reports') }}',
@@ -132,8 +213,52 @@
                 }
             };
 
-            fetchReports();
         });
+
+    function removeFunc(id) {
+        if (id) { 
+            $("#removeForm").on('submit', function() {
+                var form = $(this);
+                $(".text-danger").remove();
+
+                $.ajax({
+                    url: '{{ route("admin.event.report.delete", ":id") }}'.replace(':id', id),
+                    type: form.attr('method'),
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        del_id: id,
+                        _method: 'DELETE'  
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if ($.fn.DataTable.isDataTable('#reportTable')) {
+                            $('#reportTable').DataTable().ajax.reload(null, false);
+                        }
+                        $("#removeModal").modal('hide');
+                        if (response.success === true) {
+                            toastr.success(response.messages);
+                        } else {
+                            if (response.error instanceof Array) {
+                                    var errorMessages = '';
+                                    $.each(response.error, function (key, value) {
+                                        errorMessages += value.join('<br>'); 
+                                    });
+                                    toastr.error(errorMessages);
+                                } else {
+                                    toastr.error(response.error);
+                                }
+                                
+                                $("#removeModal").modal('hide');
+                        
+                            }
+                        }
+                });
+
+                return false;
+            });
+        }
+
+    };
     </script>
 
 

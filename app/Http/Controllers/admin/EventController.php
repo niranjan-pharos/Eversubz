@@ -561,21 +561,52 @@ class EventController extends Controller
             ],
         ];
 
-        return view('admin.events.events_report', compact('breadcrumbs'));
+        $events = Event::all();
+        $users = User::where('active_status',1)->get();
+
+        return view('admin.events.events_report', compact('breadcrumbs','events','users'));
     }
 
     public function getEventReports() {
           $eventReports = EventReport::with(['event', 'user'])->orderBy('created_at', 'desc')->get();
-        return response()->json($eventReports);
+
+
+          $result = ['data' => []];
+          $i = 1;
+          $buttons = '';
+
+        foreach ($eventReports as $key => $post) {
+
+            $buttons = '<button type="button" class="btn btn-default btn-sm icon-btn" onclick="removeFunc(\'' . $post->id . '\')" data-bs-toggle="modal" data-bs-target="#removeModal"><i class="fa fa-trash"></i></button>';
+
+            $result['data'][] = [
+                $i,
+                $post?->event?->title ?? '-',
+                $post?->user?->name ?? '-',
+                $post->reason,
+                optional($post->created_at)->format('d-m-Y'),
+                optional($post->updated_at)->format('d-m-Y'),
+                $buttons
+            ];
+
+            $i++;
+        }
+       
+        return response()->json($result);
     }
 
     public function deleteReports($id) {
-        $eventReport = EventReport::findOrFail($id);
-        $eventReport->delete();
+        try{
+            $eventReport = EventReport::findOrFail($id);
+            $eventReport->delete();
 
-        return response()->json(['success' => 'Report deleted successfully.']);
+            return response()->json(['success' => true, 'messages' => 'Report deleted successfully.']);
+        }catch (\Exception $e) {
+            return response()->json(['error' => false, 'messages' => "Error deleting Event"]);
+        }
+        
     }
-
+    
     // Tickets
     public function tickets() {
         $breadcrumbs = [

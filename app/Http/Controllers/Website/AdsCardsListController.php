@@ -31,9 +31,13 @@ class AdsCardsListController extends Controller
     {
         $query = $request->get('q', '');
 
-        if($query) {
-            $users = User::where('uid', 'LIKE', "%{$query}%")
-                        ->select('id', 'name','uid','email')
+        if ($query) {
+            $users = User::where(function ($q) use ($query) {
+                            $q->where('uid', 'LIKE', "%{$query}%")
+                              ->orWhere('name', 'LIKE', "%{$query}%");
+                        })
+                        ->where('account_type',3)->where('active_status',1)
+                        ->select('id', 'name', 'uid', 'email')
                         ->limit(10)
                         ->get();
         } else {
@@ -42,4 +46,5 @@ class AdsCardsListController extends Controller
 
         return response()->json($users);
     }
+
 }

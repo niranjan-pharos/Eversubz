@@ -66,7 +66,7 @@ class NgoController extends Controller
         ->orderBy('ngos_count', 'desc')
         ->get();
 
-        $donationPackages = DonationPackage::select('id', 'name', 'image','status', 'price', 'quantity', 'status', 'created_at', 'updated_at', 'ngo_id')
+        $donationPackages = DonationPackage::select('id', 'name', 'image','status', 'price', 'quantity', 'status', 'created_at', 'updated_at', 'ngo_id')->where('status',1)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -499,22 +499,20 @@ class NgoController extends Controller
             ->orderBy('id', 'desc')
             ->firstOrFail();
 
+
+            $purchesedqty = (int) DonatePackage::where('donatepkg_id', $donationPackages->id)->sum('quantity');
+            $totalquantity = (int) $donationPackages->quantity;
+            $percentage = (($purchesedqty / $totalquantity) * 100) ?? 0;
+
             $encryptedId = encrypt($donationPackages->id);
 
-            $topDonors = DonatePackage::where('donatepkg_id', $donationPackages->id)
-            ->select(
-                'user_id',
-                'created_at',
-                \DB::raw('SUM(amount) as total_amount'),
-                \DB::raw('MAX(anonymous) as is_anonymous'),
-                \DB::raw('MAX(donation_number) as latest_donation_number'),
-                \DB::raw('MAX(created_at) as last_donation_time')
-            )
-            ->groupBy('user_id')
-            ->orderByDesc('total_amount')
-            ->with('user')
-            ->take(5)
-            ->get();
+            $topDonors = DonatePackage::with('user')
+                ->where('donatepkg_id', $donationPackages->id)
+                ->orderByDesc('quantity')
+                ->get()
+                ->unique('user_id')
+                ->take(5)
+                ->values();
 
         $allDonors = DonatePackage::where('donatepkg_id', $donationPackages->id)
             ->with('user')
@@ -531,12 +529,15 @@ class NgoController extends Controller
             'is_module_visible',
             'topDonors',
             'allDonors',
-            'encryptedId'
+            'encryptedId',
+            'purchesedqty',
+            'totalquantity',
+            'percentage'
         ));
     }
 
 
-    public function support($id, $price = '0.00'){
+    public function support($id, $price = '0.00', $quantity = 0){
 
         try {
             $decrypted = Crypt::decryptString(urldecode($id));
@@ -567,7 +568,7 @@ class NgoController extends Controller
             ->orderBy('id', 'desc')
             ->firstOrFail();
 
-        return view('website.ngo.donatepackage', compact('donationPackages', 'price','id','encryptedId'));
+        return view('website.ngo.donatepackage', compact('donationPackages', 'price','id','encryptedId','quantity'));
     }
 
 
@@ -690,12 +691,12 @@ class NgoController extends Controller
             'coverTransactionCosts' => 'required|in:0,1',
             'anonymous' => 'nullable|in:0,1',
             'first_name' => 'required|string|max:255',
-
             'phone' => 'required|string|max:15',
             'email' => 'required|email|max:255',
             'country' => 'required|string|max:100',
             'message' => 'nullable|string|max:1000',
             'fundraising_id' => 'required',
+            'quantity' => 'required|numeric|min:1',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -709,6 +710,7 @@ class NgoController extends Controller
         }
 
         $fundraisingId = Crypt::decrypt($request->input('fundraising_id'));
+        $quantity = $request->input('quantity');
         $validatedData = $validator->validated();
 
         $anonymous = isset($validatedData['anonymous']) && $validatedData['anonymous'] == 1 ? 1 : 0;
@@ -736,6 +738,7 @@ class NgoController extends Controller
                 'country' => $validatedData['country'],
                 'message' => $validatedData['message'] ?? null,
                 'amount' => $donationAmount,
+                'quantity' =>$quantity,
                 'tip' => $tipAmount,
                 'transaction_fee' => $transactionFee,
                 'total_amount' => $totalAmount,

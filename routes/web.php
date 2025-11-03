@@ -37,6 +37,7 @@ use App\Http\Controllers\Website\JobsController;
 use App\Http\Controllers\Website\CartController;
 use App\Http\Controllers\Website\CheckoutController;
 use App\Http\Controllers\Website\BlogsController;
+use App\Http\Controllers\Website\QuickTrackController;
 use App\Http\Controllers\Website\HelpcenterController;
 use App\Http\Controllers\Website\CandidateProfileController;
 use App\Http\Controllers\Website\WebhookController;
@@ -155,6 +156,9 @@ Route::get('help-center/subcategory/{slug}', [HelpcenterController::class, 'subc
 Route::get('blogs', [BlogsController::class, 'index'])->name('blogs'); 
 Route::get('blog/{slug}', [BlogsController::class, 'show'])->name('blog.show'); 
 Route::post('/enquiry/submit', [EnquiryController::class, 'submitEnquiry'])->name('enquiry.submit');
+
+
+Route::get('quick-track', [QuickTrackController::class, 'index'])->name('blogs'); 
 
 Route::get('/check-login', function () {
     return response()->json([

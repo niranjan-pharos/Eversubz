@@ -398,6 +398,10 @@
                                     <span class="spriticon spriticon-blog"></span>
                                     Blogs
                                 </a></li>
+                            <li class="navbar-item"><a class="navbar-link" href="https://eversabz.com/blogs">
+                                    <span class="spriticon spriticon-blog"></span>
+                                    Blogs
+                                </a></li>
                         </ul>
 
                         <hr>

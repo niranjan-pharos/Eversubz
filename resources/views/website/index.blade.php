@@ -6,6 +6,7 @@
 
 <style>
     .desktop-view-sections .card:hover{    box-shadow: 0px 0px 4px;}
+
 </style>
 <main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm]  h-[calc(100vh-var(--m-top))] ">
 
@@ -118,6 +119,20 @@
 
                                 <span>
                                     Blogs</span>
+                            </a>
+
+                        </li>
+
+                        <li class="navbar-item " style="margin-top: -18px;">
+                            <a class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 "
+                                href="{{ route ('blogs') }}">
+
+
+                                <span class="spriticon spriticon-category"></span>
+
+
+                                <span>
+                                    Quick Track</span>
                             </a>
 
                         </li>

@@ -104,7 +104,7 @@
                         <div class="relative">
                             <input type="text" id="userSearchInput"
                                 class="w-full border border-gray-300 rounded-lg py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Search by User Name or Id">
+                                placeholder="Search by NGO Name or Id">
                             <i class="fa fa-search absolute right-3 top-1/2 -translate-y-1/2 text-blue-500"></i>
                         </div>
 

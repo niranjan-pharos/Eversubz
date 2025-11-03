@@ -391,7 +391,7 @@
                                     class="navbar-link{{ Request::is('business') ? ' active' : '' }}"
                                     href="{{ asset ('business/list') }}"><span>
                                         <img src="{{ asset('assets/images/icons/business-list.png') }}" alt="user">
-                                        Business List</span></a>
+                                        Business List1</span></a>
                             </li>
 
                             <li class="navbar-item "><a
